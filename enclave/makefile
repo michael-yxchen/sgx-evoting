@@ -7,12 +7,14 @@
 include ../common/common.mk
 include ../common/rules.mk
 
+Enclave_Include_Paths := -L /usr/src/sgxiot/trustedLib/
+
 SGX_EDGER8R_FLAGS += --trusted-dir ../interface
-CFLAGS += $(SGX_ENCLAVE_CFLAGS) -std=c99 -Wno-unused-parameter
+CFLAGS += $(SGX_ENCLAVE_CFLAGS) -std=c99 -Wno-unused-parameter -l/libsgx_tgmp.a
 CXXFLAGS += $(SGX_ENCLAVE_CXXFLAGS)
-CPPFLAGS += $(SGX_ENCLAVE_CPPFLAGS) -I../interface
+CPPFLAGS += $(SGX_ENCLAVE_CPPFLAGS) -I../interface -I /usr/src/sgxiot/trustedLib/
 LDFLAGS += $(SGX_ENCLAVE_LDFLAGS)
-LDLIBS += -L ../interface -lenclave_stub_t $(SGX_ENCLAVE_LDLIBS)
+LDLIBS += -L ../interface -lenclave_stub_t $(SGX_ENCLAVE_LDLIBS) -L /usr/src/sgxiot/trustedLib/
 
 .PHONY: all clean
 
@@ -20,7 +22,7 @@ all: ../interface/libenclave_stub_t.a enclave.signed.so
 
 ../interface/libenclave_stub_t.a: ../interface/enclave.edl
 
-enclave.unsigned.so: calcbuffsize.o keygen.o print.o sign.o quote.o
+enclave.unsigned.so: calcbuffsize.o keygen.o print.o sign.o quote.o admin.o
 
 enclave.signed.so: enclave.key.pem
 
@@ -29,4 +31,5 @@ enclave.key.pem:
 
 clean:
 	rm -f ../interface/*_t.* enclave.key.pem enclave.unsigned.so enclave.signed.so *.o
+
 

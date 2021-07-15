@@ -15,6 +15,7 @@ static struct option long_options[] = {
     {"keygen", no_argument, 0, 0},
     {"quote", no_argument, 0, 0},
     {"sign", no_argument, 0, 0},
+    {"admin", no_argument, 0, 0},
     {"enclave-path", required_argument, 0, 0},
     {"sealedprivkey", required_argument, 0, 0},
     {"sealedpubkey", required_argument, 0, 0},
@@ -30,6 +31,7 @@ int main(int argc, char **argv) {
     bool opt_keygen = false;
     bool opt_quote = false;
     bool opt_sign = false;
+    bool opt_admin = false;
     const char *opt_enclave_path = NULL;
     const char *opt_sealedprivkey_file = NULL;
     const char *opt_sealedpubkey_file = NULL;
@@ -53,23 +55,27 @@ int main(int argc, char **argv) {
                 opt_sign = true;
                 break;
             case 3:
-                opt_enclave_path = optarg;
+                opt_admin = true;
                 break;
             case 4:
-                opt_sealedprivkey_file = optarg;
+                opt_enclave_path = optarg;
                 break;
             case 5:
-                opt_sealedpubkey_file = optarg;
+                opt_sealedprivkey_file = optarg;
                 break;
             case 6:
-                opt_signature_file = optarg;
+                opt_sealedpubkey_file = optarg;
                 break;
             case 7:
-                opt_public_key_file = optarg;
+                opt_signature_file = optarg;
                 break;
             case 8:
+                opt_public_key_file = optarg;
+                break;
+            case 9:
                 opt_quote_file = optarg;
                 break;
+
         }
     }
 
@@ -77,16 +83,16 @@ int main(int argc, char **argv) {
         opt_input_file = argv[optind++];
     }
 
-    if (!opt_keygen && !opt_sign && !opt_quote) {
+    if (!opt_keygen && !opt_sign && !opt_quote && !opt_admin) {
         fprintf(
             stderr,
-            "Error: Must specifiy either --keygen or --sign or --quotegen\n");
+            "Error: Must specifiy either --keygen or --sign or --quotegen or --admin\n");
         return EXIT_FAILURE;
     }
 
     if (opt_keygen && (!opt_enclave_path || !opt_sealedprivkey_file ||
                        !opt_sealedprivkey_file || !opt_public_key_file)) {
-        fprintf(stderr, "Usage:\n");
+        fprintf(stderr, "UsageKeygen:\n");
         fprintf(stderr,
                 "  %s --keygen --enclave-path /path/to/enclave.signed.so "
                 "--sealedprivkey sealedprivkey.bin "
@@ -98,7 +104,7 @@ int main(int argc, char **argv) {
 
     if (opt_quote &&
         (!opt_enclave_path || !opt_sealedpubkey_file || !opt_quote_file)) {
-        fprintf(stderr, "Usage:\n");
+        fprintf(stderr, "UsageQuote:\n");
         fprintf(stderr,
                 "  %s --quotegen --enclave-path /path/to/enclave.signed.so "
                 "--sealedpubkey sealedpubkey.bin --quotefile quote.json\n",
@@ -108,7 +114,7 @@ int main(int argc, char **argv) {
 
     if (opt_sign && (!opt_enclave_path || !opt_sealedprivkey_file ||
                      !opt_signature_file || !opt_input_file)) {
-        fprintf(stderr, "Usage:\n");
+        fprintf(stderr, "UsageSign:\n");
         fprintf(stderr,
                 "  %s --sign --enclave-path /path/to/enclave.signed.so "
                 "--sealedprivkey "
@@ -116,15 +122,35 @@ int main(int argc, char **argv) {
                 argv[0]);
         return EXIT_FAILURE;
     }
+    
+    if (opt_admin && (!opt_enclave_path || !opt_sealedprivkey_file ||
+                       !opt_sealedprivkey_file || !opt_public_key_file)) {
+        fprintf(stderr, "UsageAdmin:\n");
+        fprintf(stderr,
+                "  %s --keygen --enclave-path /path/to/enclave.signed.so "
+                "--sealedprivkey sealedprivkey.bin "
+                "--sealedpubkey sealedpubkey.bin "
+                "--public-key mykey.pem\n",
+                argv[0]);
+        return EXIT_FAILURE;
+    }
 
     OpenSSL_add_all_algorithms(); /* Init OpenSSL lib */
 
     bool success_status =
-        create_enclave(opt_enclave_path) && enclave_get_buffer_sizes() &&
-        allocate_buffers() && (opt_keygen ? enclave_generate_key() : true) &&
+        create_enclave(opt_enclave_path) && 
+        enclave_get_buffer_sizes() &&
+        allocate_buffers() && 
+        // keygen
+        (opt_keygen ? enclave_generate_key() : true) &&
         (opt_keygen
              ? save_enclave_state(opt_sealedprivkey_file, opt_sealedpubkey_file)
              : true) &&
+        // admin
+        (opt_admin ? enclave_generate_key_elgamal() : true) &&
+        (opt_admin
+             ? save_enclave_state(opt_sealedprivkey_file, opt_sealedpubkey_file)
+             : true) &&     
         // quote
         (opt_quote ? load_sealedpubkey(opt_sealedpubkey_file) : true) &&
         (opt_quote ? enclave_gen_quote() : true) &&
@@ -149,3 +175,4 @@ int main(int argc, char **argv) {
 
     return success_status ? EXIT_SUCCESS : EXIT_FAILURE;
 }
+

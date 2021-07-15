@@ -68,6 +68,8 @@ bool load_input_file(const char *const input_file);
 bool enclave_sign_data(void);
 
 bool enclave_generate_key(void);
+// Mohammad
+bool enclave_generate_key_elgamal(void);
 
 bool enclave_generate_quote(sgx_report_data_t report_data);
 bool enclave_gen_quote();
@@ -100,3 +102,4 @@ void print_hexstring_nl(FILE *fp, const void *src, size_t len);
 const char *hexstring(const void *src, size_t len);
 
 #endif /* !_APP_H */
+

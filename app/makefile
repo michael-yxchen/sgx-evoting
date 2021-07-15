@@ -21,8 +21,9 @@ all: ../interface/libenclave_stub_u.a app
 
 ../interface/libenclave_stub_u.a: ../interface/enclave.edl
 
-app: app.o globals.o ocall_print_string.o decode_sgx_status.o enclave.o buffers.o enclave_state.o endianswap.o readfile.o ecall_buffer.o keygen.o sign.o open_file.o hexutil.o base64.o quote.o
+app: app.o globals.o ocall_print_string.o decode_sgx_status.o enclave.o buffers.o enclave_state.o endianswap.o readfile.o ecall_buffer.o keygen.o sign.o open_file.o hexutil.o base64.o quote.o admin.o
 #ocall_print_int.o
 
 clean:
 	rm -f ../interface/*_u.* app *.o
+

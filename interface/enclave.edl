@@ -22,6 +22,12 @@ enclave
             [out, size=sealedprivkey_size] char *sealedprivkey,
             size_t sealedprivkey_size);
 
+        public sgx_status_t ecall_key_gen_and_seal_all_elgamal(
+            [out, size=sealedpubkey_size] char *sealedpubkey,
+            size_t sealedpubkey_size,
+            [out, size=sealedprivkey_size] char *sealedprivkey,
+            size_t sealedprivkey_size);
+
         public sgx_status_t ecall_calc_buffer_sizes(
             [out] size_t* epubkey_size,
             [out] size_t* esealedpubkey_size,
