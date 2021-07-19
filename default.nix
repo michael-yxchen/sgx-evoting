@@ -1,26 +1,25 @@
 let
   sources = import ./nix/sources.nix;
   pkgs = import sources.nixpkgs { };
-  sgxsdk = /nix/store/znr7dg5bkv2kspcmqrak59hb88hcqv4k-sgxsdk;
+  sgx = import sources.sgx;
 in
 pkgs.stdenv.mkDerivation {
-  inherit sgxsdk;
   name = "sgx-iot";
   # FIXME not sure why but the build is non-deterministic if using src = ./.;
   # Possibly some untracked file(s) causing the problem ...?
   #src = ./.;
-  # NOTE The commit (rev) cannot include this file, and therefore will at the very
-  # best one commit behind the commit including this file.
+  # NOTE The commit (rev) cannot include this file, and therefore will, at the very
+  # best, be one commit behind the commit including this file.
   src = pkgs.fetchFromGitHub {
     owner = "sbellem";
     repo = "sgx-iot";
-    rev = "15f71652592c684985c67a0ecf5215ac9a34e31c";
+    rev = "1e789030c9119c522be278cdef868913b342f424";
     # Command to get the sha256 hash (note the --fetch-submodules arg):
-    # nix run -f '<nixpkgs>' nix-prefetch-github -c nix-prefetch-github --rev 15f71652592c684985c67a0ecf5215ac9a34e31c sbellem sgx-iot
-    sha256 = "143krl3zzbqksnm6y3l2mvwsrlw9n96bdc51nbqkr7b2960c6nrp";
+    # nix run -f '<nixpkgs>' nix-prefetch-github -c nix-prefetch-github --rev 1e789030c9119c522be278cdef868913b342f424 sbellem sgx-iot
+    sha256 = "0xcvbmmjlznw9bnizrd3cq85kixa5n3qkbc5dvi1xcyr6xc6ipwl";
   };
   preConfigure = ''
-    export SGX_SDK=$sgxsdk/sgxsdk
+    export SGX_SDK=${sgx.sgxsdk}/sgxsdk
     export PATH=$PATH:$SGX_SDK/bin:$SGX_SDK/bin/x64
     export PKG_CONFIG_PATH=$SGX_SDK/pkgconfig
     export LD_LIBRARY_PATH=$SGX_SDK/sdk_libs
@@ -29,7 +28,7 @@ pkgs.stdenv.mkDerivation {
     '';
   #configureFlags = ["--with-sgxsdk=$SGX_SDK"];
   buildInputs = with pkgs; [
-    sgxsdk
+    sgx.sgxsdk
     unixtools.xxd
     bashInteractive
     autoconf
@@ -48,7 +47,7 @@ pkgs.stdenv.mkDerivation {
     cp enclave/enclave.signed.so $out/bin/
 
     runHook postInstall
-  '';
+    '';
   #postInstall = ''
   #  $sgxsdk/sgxsdk/bin/x64/sgx_sign dump -cssfile enclave_sigstruct_raw -dumpfile /dev/null -enclave $out/bin/Enclave.signed.so
   #  cp enclave_sigstruct_raw $out/bin/

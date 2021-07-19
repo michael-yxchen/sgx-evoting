@@ -1,31 +1,21 @@
-FROM initc3/nix-sgx-sdk@sha256:509e4c8e5ab7aeea4d78d2f61df45caa388279036a0c8e984630321d783ea2d3 AS build-enclave
+##############################################################################
+#                                                                            #
+#                            Demo base                                       #
+#                                                                            #
+##############################################################################
+#FROM initc3/linux-sgx:2.13.3-ubuntu20.04 AS demo-base
+FROM ubuntu:20.04 AS demo-base
 
-WORKDIR /usr/src
+ENV DEBIAN_FRONTEND=noninteractive
+ENV PYTHONUNBUFFERED 1
 
-COPY common /usr/src/common
-COPY enclave /usr/src/enclave
-COPY interface /usr/src/interface
-COPY makefile /usr/src/makefile
-
-COPY nix /usr/src/nix
-COPY enclave.nix /usr/src/enclave.nix
-
-RUN nix-build enclave.nix
-
-
-FROM initc3/linux-sgx:2.13-ubuntu20.04
-
+# Python 3.9
 RUN apt-get update && apt-get install -y \
-                autotools-dev \
-                automake \
-                xxd \
-                iputils-ping \
-                libssl-dev \
                 python3.9 \
                 python3.9-dev \
                 python3-pip \
-                vim \
                 git \
+                wget \
         && rm -rf /var/lib/apt/lists/*
 
 # symlink python3.9 to python
@@ -62,32 +52,6 @@ RUN set -ex; \
 		\) -exec rm -rf '{}' +; \
 	rm -f get-pip.py
 
-RUN pip install cryptography ipython requests pyyaml ipdb blessings colorama
-RUN set -ex; \
-    \
-    cd /tmp; \
-    git clone --recurse-submodules https://github.com/sbellem/auditee.git; \
-    pip install auditee/
-
-WORKDIR /usr/src/sgxiot
-
-ENV SGX_SDK /opt/sgxsdk
-ENV PATH $PATH:$SGX_SDK/bin:$SGX_SDK/bin/x64
-ENV PKG_CONFIG_PATH $SGX_SDK/pkgconfig
-ENV LD_LIBRARY_PATH $SGX_SDK/sdk_libs
-
-COPY . .
-
-COPY --from=build-enclave /usr/src/result/bin/enclave.signed.so enclave/enclave.signed.so
-
-ARG SGX_MODE=HW
-ENV SGX_MODE $SGX_MODE
-
-ARG SGX_DEBUG=1
-ENV SGX_DEBUG $SGX_DEBUG
-
-RUN make just-app
-
 # docker cli
 RUN set -ex; \
     \
@@ -107,4 +71,148 @@ RUN echo \
 
 RUN apt-get update && apt-get install -y docker-ce-cli
 
-ENV PYTHONUNBUFFERED 1
+# SGX PSW
+ENV INTEL_SGX_URL "https://download.01.org/intel-sgx"
+RUN set -eux; \
+    url="$INTEL_SGX_URL/sgx_repo/ubuntu"; \
+    echo "deb [arch=amd64] $url focal main" \
+                | tee /etc/apt/sources.list.d/intel-sgx.list; \
+    wget -qO - "$url/intel-sgx-deb.key" | apt-key add -; \
+    apt-get update; \
+    apt-get install -y --no-install-recommends \
+                libsgx-headers \
+                libsgx-ae-epid \
+                libsgx-ae-le \
+                libsgx-ae-pce \
+                libsgx-enclave-common \
+                libsgx-enclave-common-dev \
+                libsgx-epid \
+                libsgx-epid-dev \
+                libsgx-uae-service \
+                libsgx-urts; \
+    rm -rf /var/lib/apt/lists/*;
+
+# install nix
+ARG UID=1000
+ARG GID=1000
+
+RUN apt-get update && apt-get install --yes git curl wget sudo xz-utils
+RUN groupadd --gid $GID --non-unique photon \
+    && useradd --create-home --uid $UID --gid $GID --non-unique --shell /bin/bash photon \
+    && usermod --append --groups sudo photon \
+    && echo "photon ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/photon \
+    && mkdir -p /etc/nix \
+    && echo 'sandbox = false' > /etc/nix/nix.conf
+
+ENV USER photon
+USER photon
+
+WORKDIR /home/photon
+
+#COPY --chown=photon:photon ./nix.conf /home/photon/.config/nix/nix.conf
+
+RUN curl -L https://nixos.org/nix/install | sh
+
+RUN . /home/photon/.nix-profile/etc/profile.d/nix.sh && \
+  nix-channel --add https://nixos.org/channels/nixos-21.05 nixpkgs && \
+  nix-channel --update && \
+  nix-env -iA cachix -f https://cachix.org/api/v1/install && \
+  cachix use initc3
+
+ENV NIX_PROFILES "/nix/var/nix/profiles/default /home/photon/.nix-profile"
+ENV NIX_PATH /home/photon/.nix-defexpr/channels
+ENV NIX_SSL_CERT_FILE /etc/ssl/certs/ca-certificates.crt
+ENV PATH /home/photon/.nix-profile/bin:$PATH
+
+RUN pip install --user cryptography ipython requests pyyaml ipdb blessings colorama
+RUN set -ex; \
+    \
+    cd /tmp; \
+    git clone --branch dev --recurse-submodules https://github.com/sbellem/auditee.git; \
+    pip install --user auditee/
+
+ENV PATH="/home/photon/.local/bin:${PATH}"
+
+##############################################################################
+#                                                                            #
+#                            Build enclave (trusted)                         #
+#                                                                            #
+##############################################################################
+FROM  nixpkgs/nix AS build-enclave
+
+WORKDIR /usr/src
+
+COPY common /usr/src/common
+COPY enclave /usr/src/enclave
+COPY interface /usr/src/interface
+COPY makefile /usr/src/makefile
+
+COPY nix /usr/src/nix
+COPY default.nix /usr/src/default.nix
+
+# install cachix, to fetch prebuilt sgxsdk from cache
+RUN nix-env -iA cachix -f https://cachix.org/api/v1/install
+RUN /nix/store/*cachix*/bin/cachix use initc3
+
+RUN nix-build
+
+##############################################################################
+#                                                                            #
+#                            Build app (untrusted)                           #
+#                                                                            #
+##############################################################################
+FROM initc3/linux-sgx:2.13.3-ubuntu20.04 AS build-app
+
+RUN apt-get update && apt-get install -y \
+                autotools-dev \
+                automake \
+                xxd \
+                iputils-ping \
+                libssl-dev \
+                vim \
+                git \
+        && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /usr/src/sgxiot
+
+ENV SGX_SDK /opt/sgxsdk
+ENV PATH $PATH:$SGX_SDK/bin:$SGX_SDK/bin/x64
+ENV PKG_CONFIG_PATH $SGX_SDK/pkgconfig
+ENV LD_LIBRARY_PATH $SGX_SDK/sdk_libs
+
+COPY . .
+
+ARG SGX_MODE=HW
+ENV SGX_MODE $SGX_MODE
+
+ARG SGX_DEBUG=1
+ENV SGX_DEBUG $SGX_DEBUG
+
+RUN make untrusted
+
+##############################################################################
+#                                                                            #
+#                            Demo runtime                                    #
+#                                                                            #
+##############################################################################
+FROM demo-base
+
+RUN mkdir /home/photon/sgxiot
+WORKDIR /home/photon/sgxiot
+
+COPY --chown=photon:photon common common
+COPY --chown=photon:photon enclave enclave
+COPY --chown=photon:photon interface interface
+COPY --chown=photon:photon nix nix
+COPY --chown=photon:photon .auditee.yml \
+                           default.nix \
+                           makefile \
+                           nix.Dockerfile \
+                           run_demo_sgxra.sh \
+                           Sensor_Data \
+                           verify.py \
+                           ./
+
+COPY --from=build-enclave --chown=photon:photon /usr/src/result/bin/enclave.signed.so enclave/enclave.signed.so
+COPY --from=build-app --chown=photon:photon /usr/src/sgxiot/app app
+COPY --from=initc3/linux-sgx:2.13.3-ubuntu20.04 --chown=photon:photon /opt/sgxsdk /opt/sgxsdk
