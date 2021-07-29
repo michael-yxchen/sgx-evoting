@@ -8,14 +8,27 @@ RUN apt-get update && apt-get install -y \
                 libssl-dev \
                 vim \
                 git \
+                texinfo \
         && rm -rf /var/lib/apt/lists/*
 
-WORKDIR /usr/src/sgxvoting
 
 ENV SGX_SDK /opt/sgxsdk
 ENV PATH $PATH:$SGX_SDK/bin:$SGX_SDK/bin/x64
 ENV PKG_CONFIG_PATH $SGX_SDK/pkgconfig
 ENV LD_LIBRARY_PATH $SGX_SDK/sdk_libs
+
+# installing sgx-gmp library
+RUN cd /tmp;\
+git clone https://github.com/intel/sgx-gmp.git;\
+cd sgx-gmp;\
+./configure --prefix=/opt/gmp/6.1.2 --enable-assembly --disable-shared --enable-static --with-pic; \
+make -j; \
+make install; \
+./sgx-configure; \
+make -j; \
+make install
+
+WORKDIR /usr/src/sgxvoting
 
 # COPY . .
 
