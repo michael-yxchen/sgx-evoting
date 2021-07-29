@@ -15,6 +15,7 @@
 #include <sgx_tseal.h>
 #include <sgx_utils.h>
 #include "sgx_tgmp.h"
+#include <gmp.h>
 
 /**
  * This function generates a key pair and then seals the private key.
@@ -28,19 +29,85 @@
  * some sgx_status_t value upon failure.
  */
 
+// Key generator for Elgamal
+void Elgamal_Gen(mpz_t sk, mpz_t pk, mpz_t g, mpz_t modulus){	
+	int seedx = 1; //rand();
+	gmp_randstate_t ry_state;
+	
+   gmp_randinit_default(ry_state);
+	gmp_randseed_ui(ry_state, seedx);
+ 	
+ 	mpz_urandomm(sk, ry_state, modulus);
+ 	mpz_powm(pk, g, sk, modulus);
+	gmp_randclear(ry_state);
+}
+
+// Encryption function for Elgamal
+void Elgamal_encrypt(mpz_t cipher0, mpz_t cipher1, mpz_t message, mpz_t pk, mpz_t g, mpz_t modulus){
+	int seedy = 1; //rand();
+	
+	mpz_t y;
+	mpz_t pky;
+	gmp_randstate_t ry_state;
+	
+	mpz_init(y);
+	mpz_init(pky);
+    gmp_randinit_default(ry_state);
+	gmp_randseed_ui(ry_state, seedy);
+ 	
+ 	mpz_urandomm(y,ry_state, modulus);
+ 	
+ 	mpz_powm(pky, pk, y, modulus);
+ 	mpz_mul(cipher0, message, pky);
+ 	mpz_mod(cipher0, cipher0, modulus);
+ 	mpz_powm(cipher1, g, y, modulus);
+
+	mpz_clear(y);
+	mpz_clear(pky);
+	gmp_randclear(ry_state);
+}
+
+// Decryption function for Elgamal
+void Elgamal_decrypt(mpz_t message,mpz_t cipher0, mpz_t cipher1, mpz_t sk, mpz_t modulus){
+	mpz_t gxy;
+	mpz_t inv_gxy;
+
+	mpz_init(gxy);
+	mpz_init(inv_gxy);
+
+	mpz_powm(gxy, cipher1, sk, modulus);
+	mpz_invert(inv_gxy, gxy, modulus);
+	mpz_mul(message, cipher0, inv_gxy);
+	mpz_mod(message, message, modulus);
+
+	mpz_clear(gxy);
+	mpz_clear(inv_gxy);
+}
+
 sgx_status_t ecall_key_gen_and_seal_elgamal(char *pubkey, size_t pubkey_size,
                                     char *sealedprivkey,
                                     size_t sealedprivkey_size) {
     // Step 1: Open Context.
     sgx_status_t ret = SGX_ERROR_UNEXPECTED;
     sgx_ecc_state_handle_t p_ecc_handle = NULL;
-    int solve;
-    mpz_t q;
+    
+    mpz_t g;
     mpz_t p;
+    mpz_t sk;
+    mpz_t pk;
 
-    mpz_init(q);
+    mpz_init(g); 
     mpz_init(p);
+    mpz_init(pk);
+    mpz_init(sk);
+    
+    Elgamal_Gen(sk, pk, g, p);
 
+    //gmp_printf("\nvalue of g: \n%Zd ", g);
+    //gmp_printf("\nvalue of mod: \n%Zd ", p);
+    //gmp_printf("\nvalue of pk: \n%Zd ", pk);
+    //gmp_printf("\nvalue of sk: \n%Zd\n", sk);
+    
     if ((ret = sgx_ecc256_open_context(&p_ecc_handle)) != SGX_SUCCESS) {
         print("\nTrustedApp: sgx_ecc256_open_context() failed !\n");
         goto cleanup;
@@ -160,4 +227,5 @@ cleanup:
 
     return ret;
 }
+
 
