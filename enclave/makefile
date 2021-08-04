@@ -12,9 +12,9 @@ Enclave_Include_Paths := -L /usr/src/sgxiot/trustedLib/
 SGX_EDGER8R_FLAGS += --trusted-dir ../interface
 CFLAGS += $(SGX_ENCLAVE_CFLAGS) -std=c99 -Wno-unused-parameter
 CXXFLAGS += $(SGX_ENCLAVE_CXXFLAGS)
-CPPFLAGS += $(SGX_ENCLAVE_CPPFLAGS) -I../interface -I /usr/src/sgxiot/trustedLib/include/ -I /usr/src/sgxiot/include/
+CPPFLAGS += $(SGX_ENCLAVE_CPPFLAGS) -I../interface -I /usr/src/sgxiot/trustedLib/ -I /usr/src/sgxiot/include/
 LDFLAGS += $(SGX_ENCLAVE_LDFLAGS)
-LDLIBS += -L ../interface -lenclave_stub_t $(SGX_ENCLAVE_LDLIBS) -L /usr/src/sgxiot/trustedLib/lib/ -L /usr/src/sgxiot/lib/ -lsgx_tgmp
+LDLIBS += -L ../interface -lenclave_stub_t $(SGX_ENCLAVE_LDLIBS) -L /usr/src/sgxiot/trustedLib/ -L /usr/src/sgxiot/lib/ -lsgx_tgmp
 
 .PHONY: all clean
 
