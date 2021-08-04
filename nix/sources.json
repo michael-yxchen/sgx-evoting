@@ -22,5 +22,17 @@
         "type": "tarball",
         "url": "https://github.com/NixOS/nixpkgs/archive/1db42b7fe3878f3f5f7a4f2dc210772fd080e205.tar.gz",
         "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
+    },
+    "sgx": {
+        "branch": "main",
+        "description": "Nix derivations for linux-sgx",
+        "homepage": null,
+        "owner": "initc3",
+        "repo": "nix-linux-sgx",
+        "rev": "71b98d9b54c70c04c1ccbb484aa34f5dd00ae238",
+        "sha256": "138jf0dbkgj7wi4ayj52fgg8kbd91ikg9dn2ik3x9qi7ds80nlv5",
+        "type": "tarball",
+        "url": "https://github.com/initc3/nix-linux-sgx/archive/71b98d9b54c70c04c1ccbb484aa34f5dd00ae238.tar.gz",
+        "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
     }
 }
