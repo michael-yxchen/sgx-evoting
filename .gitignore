@@ -60,3 +60,10 @@ result
 
 # vscode configurations
 .vscode/
+
+# interface generated files
+interface/*.h
+interface/*.c
+
+# enclave key
+enclave/enclave.key.pem
