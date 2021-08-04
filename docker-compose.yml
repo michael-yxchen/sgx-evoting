@@ -16,7 +16,7 @@ services:
       LD_LIBRARY_PATH: /opt/intel/sgx-aesm-service/aesm
     command: ./aesm_service --no-daemon
 
-  sgxvoting-dev:
+  dev:
     image: sgx_voting_dev
     build:
       context: .
