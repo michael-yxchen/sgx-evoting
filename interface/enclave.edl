@@ -54,6 +54,17 @@ enclave
             [out] sgx_report_t *report,
             [in] sgx_target_info_t *target_info,
             sgx_report_data_t report_data);
+        
+        public sgx_status_t ecall_init_bb(
+            size_t bb_size,
+            [out, size=sealedbb_size] char *sealedbb,
+            size_t sealedbb_size
+        );
+
+        public sgx_status_t ecall_calc_bb_buffer_size(
+            size_t bb_size,
+            [out] size_t *esealed_bb_size
+        );
     };
 
     untrusted

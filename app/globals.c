@@ -25,3 +25,7 @@ void *input_buffer;
 size_t input_buffer_size;
 void *quote_buffer;
 size_t quote_buffer_size;
+// public bulletin board
+size_t bb_size = 1024;
+void* sealed_bb_buffer;
+size_t sealed_bb_buffer_size;

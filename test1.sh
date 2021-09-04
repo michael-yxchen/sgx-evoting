@@ -11,14 +11,16 @@ test -d demo_sgx || mkdir demo_sgx
 cd demo_sgx
 
 # Clean up from previous runs
-rm -f sealedbb.bin
+rm -f sealedprivkey.bin sealedpubkey.bin secp256r1.pem Sensor_Data.signature quote.bin
 
-echo "Initializing bulletin board"
+echo "Provisioning private elliptic curve key:"
 # Generate the keypair (both private & public keys are sealed to enclave)
 #../app/app --keygen --enclave-path `pwd`/../enclave/enclave.signed.so --statefile sealeddata.bin --public-key secp256r1.pem
-../app/app --init-bulletin \
+../app/app --admin \
     --enclave-path `pwd`/../enclave/enclave.signed.so \
-    --bulletinfile sealedbb.bin
-echo "Bulletin board created.\n"
+    --sealedprivkey sealedprivkey.bin \
+    --sealedpubkey sealedpubkey.bin \
+    --public-key secp256r1.pem
+echo "Key provisoning completed.\n"
 
 

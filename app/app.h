@@ -38,6 +38,10 @@ extern void *input_buffer;
 extern size_t input_buffer_size;
 extern void *quote_buffer;
 extern size_t quote_buffer_size;
+extern size_t bb_size;
+extern void* sealed_bb_buffer;
+extern size_t sealed_bb_buffer_size;
+
 
 /* Function prototypes */
 
@@ -73,6 +77,9 @@ bool enclave_generate_key_elgamal(void);
 
 bool enclave_generate_quote(sgx_report_data_t report_data);
 bool enclave_gen_quote();
+
+bool enclave_init_bb();
+bool save_bb(const char * const bb_file);
 
 // bool save_enclave_state(const char *const statefile);
 bool save_enclave_state(const char *const sealedprivkey_file,

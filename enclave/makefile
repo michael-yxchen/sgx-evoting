@@ -22,7 +22,7 @@ all: ../interface/libenclave_stub_t.a enclave.signed.so
 
 ../interface/libenclave_stub_t.a: ../interface/enclave.edl
 
-enclave.unsigned.so: ../trustedLib/libsgx_tgmp.a calcbuffsize.o keygen.o print.o sign.o quote.o admin.o
+enclave.unsigned.so: ../trustedLib/libsgx_tgmp.a calcbuffsize.o keygen.o print.o sign.o quote.o admin.o struct_init.o
 
 enclave.signed.so: enclave.key.pem
 
