@@ -22,6 +22,7 @@ static struct option long_options[] = {
     {"signature", required_argument, 0, 0},
     {"public-key", required_argument, 0, 0},
     {"quotefile", required_argument, 0, 0},
+		{"sealedkey", required_argument, 0, 0},
     {0, 0, 0, 0}};
 
 /**
@@ -39,6 +40,8 @@ int main(int argc, char **argv) {
     const char *opt_input_file = NULL;
     const char *opt_public_key_file = NULL;
     const char *opt_quote_file = NULL;
+	
+		const char *opt_sealedkey_file = NULL;
 
     int option_index = 0;
 
@@ -75,6 +78,9 @@ int main(int argc, char **argv) {
             case 9:
                 opt_quote_file = optarg;
                 break;
+						case 10:
+								opt_sealedkey_file = optarg;
+								break;
 
         }
     }
@@ -123,14 +129,11 @@ int main(int argc, char **argv) {
         return EXIT_FAILURE;
     }
     
-    if (opt_admin && (!opt_enclave_path || !opt_sealedprivkey_file ||
-                       !opt_sealedprivkey_file || !opt_public_key_file)) {
+    if (opt_admin && (!opt_enclave_path || !opt_sealedkey_file)) {
         fprintf(stderr, "UsageAdmin:\n");
         fprintf(stderr,
-                "  %s --keygen --enclave-path /path/to/enclave.signed.so "
-                "--sealedprivkey sealedprivkey.bin "
-                "--sealedpubkey sealedpubkey.bin "
-                "--public-key mykey.pem\n",
+                "  %s --admin --enclave-path /path/to/enclave.signed.so "
+                "--sealedkey sealedkey.bin\n",
                 argv[0]);
         return EXIT_FAILURE;
     }
@@ -139,8 +142,8 @@ int main(int argc, char **argv) {
 
     bool success_status =
         create_enclave(opt_enclave_path) && 
-        enclave_get_buffer_sizes() &&
-        allocate_buffers() && 
+				(opt_admin ? enclave_get_elgamal_buffer_sizes() : enclave_get_buffer_sizes()) &&
+        (opt_admin ? allocate_elgamal_buffers() : allocate_buffers()) && 
         // keygen
         (opt_keygen ? enclave_generate_key() : true) &&
         (opt_keygen
@@ -148,9 +151,7 @@ int main(int argc, char **argv) {
              : true) &&
         // admin
         (opt_admin ? enclave_generate_key_elgamal() : true) &&
-        (opt_admin
-             ? save_enclave_state(opt_sealedprivkey_file, opt_sealedpubkey_file)
-             : true) &&     
+        (opt_admin ? save_enclave_state_elgamal(opt_sealedkey_file) : true) &&     
         // quote
         (opt_quote ? load_sealedpubkey(opt_sealedpubkey_file) : true) &&
         (opt_quote ? enclave_gen_quote() : true) &&

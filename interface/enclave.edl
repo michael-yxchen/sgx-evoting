@@ -21,18 +21,22 @@ enclave
             size_t sealedpubkey_size,
             [out, size=sealedprivkey_size] char *sealedprivkey,
             size_t sealedprivkey_size);
-
+				
+				// [HELIOS]
         public sgx_status_t ecall_key_gen_and_seal_all_elgamal(
-            [out, size=sealedpubkey_size] char *sealedpubkey,
-            size_t sealedpubkey_size,
-            [out, size=sealedprivkey_size] char *sealedprivkey,
-            size_t sealedprivkey_size);
+            [out, size=sealed_key_size] char *sealedkey,
+            size_t sealed_key_size);
 
         public sgx_status_t ecall_calc_buffer_sizes(
             [out] size_t* epubkey_size,
             [out] size_t* esealedpubkey_size,
             [out] size_t* esealedprivkey_size,
             [out] size_t* esignature_size);
+					
+				// [HELIOS]
+				public sgx_status_t ecall_calc_elgamal_buffer_sizes(
+            [out] size_t* e_elgamal_key_buffer_size,
+            [out] size_t* e_sealed_elgamal_key_buffer_size);
 
         public sgx_status_t ecall_unseal_and_sign(
             [in, size=msg_size] uint8_t * msg,

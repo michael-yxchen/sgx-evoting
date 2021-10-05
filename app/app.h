@@ -39,6 +39,12 @@ extern size_t input_buffer_size;
 extern void *quote_buffer;
 extern size_t quote_buffer_size;
 
+// HELIOS
+extern void *elgamal_key_buffer;
+extern size_t elgamal_key_buffer_size;
+extern void *sealed_elgamal_key_buffer;
+extern size_t sealed_elgamal_key_buffer_size;
+
 /* Function prototypes */
 
 const char *decode_sgx_status(sgx_status_t status);
@@ -68,8 +74,12 @@ bool load_input_file(const char *const input_file);
 bool enclave_sign_data(void);
 
 bool enclave_generate_key(void);
-// Mohammad
+
+// [HELIOS]
 bool enclave_generate_key_elgamal(void);
+bool enclave_get_elgamal_buffer_sizes(void);
+bool allocate_elgamal_buffers(void);
+bool save_enclave_state_elgamal(const char *const sealedkey_file);
 
 bool enclave_generate_quote(sgx_report_data_t report_data);
 bool enclave_gen_quote();

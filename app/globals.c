@@ -25,3 +25,11 @@ void *input_buffer;
 size_t input_buffer_size;
 void *quote_buffer;
 size_t quote_buffer_size;
+
+// [HELIOS]
+void *elgamal_key_buffer;
+size_t elgamal_key_buffer_size;
+void *sealed_elgamal_key_buffer;
+size_t sealed_elgamal_key_buffer_size;
+
+
