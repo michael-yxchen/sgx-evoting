@@ -18,7 +18,7 @@
 bool enclave_init_election() {
     sgx_status_t ecall_retval = SGX_ERROR_UNEXPECTED;
 
-    printf("[GatewayApp]: Calling INIT ecall to initialize election\n");
+    printf("[GatewayApp]: Calling INIT ecall to initialize election %p %d\n",  (char *)sealed_elgamal_key_buffer, sealed_elgamal_key_buffer_size);
 
     sgx_lasterr = ecall_init(
         enclave_id, &ecall_retval, (char *)sealed_elgamal_key_buffer,

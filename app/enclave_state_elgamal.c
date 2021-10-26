@@ -52,7 +52,6 @@ bool load_sealedkey(const char *const sealedkey_file) {
 
     bool ret_status =
         read_file_into_memory(sealedkey_file, &new_buffer, &new_buffer_size);
-
     /* If we previously allocated a buffer, free it before putting new one in
      * its place */
     if (sealed_elgamal_key_buffer != NULL) {
@@ -63,6 +62,6 @@ bool load_sealedkey(const char *const sealedkey_file) {
     /* Put new buffer into context */
     sealed_elgamal_key_buffer = new_buffer;
     sealed_elgamal_key_buffer_size = new_buffer_size;
-
+		printf("[GatewayApp]: Loading sealed elgamal key %d\n", sealed_elgamal_key_buffer_size);
     return ret_status;
 }
