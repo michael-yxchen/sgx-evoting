@@ -16,9 +16,9 @@ void ocall_print_string(const char *str) {
     printf("%s", str);
 }
 
-// void ocall_print_int(const int num) {
-//    /* Proxy/Bridge will check the length and null-terminate
-//     * the input string to prevent buffer overflow.
-//     */
-//    printf("%d", num);
-//}
+void ocall_print_int(const int* num) {
+   /* Proxy/Bridge will check the length and null-terminate
+    * the input string to prevent buffer overflow.
+    */
+   printf("%d\n", *num);
+}
