@@ -9,6 +9,9 @@ RUN apt-get update && apt-get install -y \
         vim \
         git \
         texinfo \
+        gdb \
+        libsgx-enclave-common-dbgsym \
+        libsgx-urts-dbgsym \
         && rm -rf /var/lib/apt/lists/*
 
 
@@ -32,6 +35,8 @@ RUN cd /tmp; \
 WORKDIR /usr/src/sgxvoting
 
 # COPY . .
+
+RUN echo "add-symbol-file /usr/src/sgxvoting/enclave/enclave.signed.so" >> /root/.gdbinit
 
 ARG SGX_MODE=HW
 ENV SGX_MODE $SGX_MODE
