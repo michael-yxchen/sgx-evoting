@@ -23,6 +23,23 @@ bool allocate_elgamal_buffers() {
     return (sgx_lasterr == SGX_SUCCESS);
 }
 
+bool allocate_election_buffers() {
+    printf("[GatewayApp]: Allocating ElGamal buffers\n");
+		sealed_election_buffer_size = 1288;
+    sealed_election_buffer = calloc(sealed_election_buffer_size, 1);
+	
+		bulletin_buffer_size = 192;
+		bulletin_buffer = calloc(bulletin_buffer_size, 1);
+
+    if (sealed_election_buffer == NULL) {
+        fprintf(stderr,
+                "[GatewayApp]: allocate_election_buffers() memory allocation failure\n");
+        sgx_lasterr = SGX_ERROR_UNEXPECTED;
+    }
+
+    return (sgx_lasterr == SGX_SUCCESS);
+}
+
 void cleanup_elgamal_buffers() {
     printf("[GatewayApp]: Deallocating elgamal buffers\n");
 

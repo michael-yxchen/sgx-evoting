@@ -51,3 +51,9 @@ void *user_sign_buffer;
 size_t user_sign_buffer_size;
 void *election_hash_buffer;
 size_t election_hash_buffer_size;
+
+void *bulletin_buffer;
+size_t bulletin_buffer_size;
+
+void *sealed_election_buffer;
+size_t sealed_election_buffer_size;

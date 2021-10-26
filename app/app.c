@@ -37,6 +37,7 @@ static struct option long_options[] = {
 		{"adminsign", required_argument, 0, 0},
 		{"usersign", required_argument, 0, 0},
 		{"electionhash", required_argument, 0, 0},
+		{"sealedelec", required_argument, 0, 0},
     {0, 0, 0, 0}};
 			
 /**
@@ -119,6 +120,8 @@ int main(int argc, char **argv) {
 		const char *opt_adminsign_file = NULL;
 		const char *opt_usersign_file = NULL;
 		const char *opt_election_hash = NULL;
+	
+		const char *opt_sealedelection_file = NULL;
 	
     int option_index = 0;
 
@@ -205,7 +208,13 @@ int main(int argc, char **argv) {
 								opt_election_hash = optarg;
 								break;
 					
+						case 25:
+								opt_sealedelection_file = optarg;
+								break;
 					
+						case 26:
+								opt_bulletin_file = optarg;
+								break;
 					
 
         }
@@ -264,7 +273,7 @@ int main(int argc, char **argv) {
         return EXIT_FAILURE;
     }
     
-	  if (opt_init && (!opt_enclave_path || !opt_sealedkey_file || !opt_adminkey_file || !opt_ballot_file || !opt_bulletin_file || !opt_voter1_file || !opt_voter2_file || !opt_voter3_file)) {
+	  if (opt_init && (!opt_enclave_path || !opt_sealedkey_file || !opt_adminkey_file || !opt_ballot_file || !opt_bulletin_file || !opt_voter1_file || !opt_voter2_file || !opt_voter3_file || !opt_sealedelection_file)) {
         fprintf(stderr, "UsageInit:\n");
         fprintf(stderr,
                 "  %s --init --enclave-path --adminkey secp256r1.pem --ballot ballot.txt --bulletin bulletin.txt --voter1 alice.pem --voter2 john.pem --voter3 justin.pem\n",
@@ -321,7 +330,10 @@ int main(int argc, char **argv) {
 				// init
 				(opt_init ? load_sealedkey(opt_sealedkey_file) : true) &&
 				(opt_init ? load_init_files(opt_ballot_file, opt_adminkey_file, opt_voter1_file, opt_voter2_file, opt_voter3_file) : true) &&
+				(opt_init ? allocate_election_buffers() : true) && 
 				(opt_init ? enclave_init_election() : true) &&
+				(opt_init ? save_election_state_elgamal(opt_sealedelection_file) : true) && 
+				(opt_init ? save_bulletin(opt_bulletin_file) : true) && 
 				// open
 				(opt_open ? load_adminsign(opt_adminsign_file) : true) &&
 				(opt_open ? enclave_open_election() : true) &&

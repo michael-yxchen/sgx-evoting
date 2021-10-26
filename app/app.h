@@ -61,6 +61,11 @@ extern size_t user_sign_buffer_size;
 extern void *election_hash_buffer;
 extern size_t election_hash_buffer_size;
 
+extern void *bulletin_buffer;
+extern size_t bulletin_buffer_size;
+extern void *sealed_election_buffer;
+extern size_t sealed_election_buffer_size;
+
 /* Function prototypes */
 
 const char *decode_sgx_status(sgx_status_t status);
@@ -98,9 +103,12 @@ bool allocate_elgamal_buffers(void);
 bool save_enclave_state_elgamal(const char *const sealedkey_file);
 bool load_sealedkey(const char *const sealedkey_file);
 bool enclave_init_election(void);
+bool allocate_election_buffers(void);
 
 bool enclave_generate_quote(sgx_report_data_t report_data);
 bool enclave_gen_quote();
+
+
 
 // bool save_enclave_state(const char *const statefile);
 bool save_enclave_state(const char *const sealedprivkey_file,

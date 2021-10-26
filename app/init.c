@@ -18,11 +18,24 @@
 bool enclave_init_election() {
     sgx_status_t ecall_retval = SGX_ERROR_UNEXPECTED;
 
-    printf("[GatewayApp]: Calling INIT ecall to initialize election %p %d\n",  (char *)sealed_elgamal_key_buffer, sealed_elgamal_key_buffer_size);
+    printf("[GatewayApp]: Calling INIT ecall to initialize election %d %c %c %c\n",  voter1_key_buffer_size, &voter1_key_buffer[0], &voter1_key_buffer[1], &voter1_key_buffer[2]);
+	
+	/*for(int i = 0; i < voter1_key_buffer_size; i++) {
+		printf("%d, %c\n", i, ((char*)voter1_key_buffer)[i]);
+	}*/
 
+	
     sgx_lasterr = ecall_init(
         enclave_id, &ecall_retval, (char *)sealed_elgamal_key_buffer,
-        sealed_elgamal_key_buffer_size);
+        sealed_elgamal_key_buffer_size, 
+				(char *)ballot_buffer, ballot_buffer_size,
+				(char *)admin_key_buffer, admin_key_buffer_size,
+				(char *)voter1_key_buffer, voter1_key_buffer_size,
+				(char *)voter2_key_buffer, voter2_key_buffer_size,
+				(char *)voter3_key_buffer, voter3_key_buffer_size,
+				(char *)bulletin_buffer, bulletin_buffer_size,
+				(char *)sealed_election_buffer, sealed_election_buffer_size);
+	
     if (sgx_lasterr == SGX_SUCCESS && (ecall_retval != SGX_SUCCESS)) {
         fprintf(stderr,
                 "[GatewayApp]: ERROR: ecall_init returned %d\n",
