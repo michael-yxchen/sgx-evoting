@@ -7,6 +7,7 @@
 #include <enclave_t.h>
 #include "enclave.h"
 
-void print(const char* const str) { ocall_print_string(str); }
+void print(const char *const str) { ocall_print_string(str); }
+void print_int(const int *num) { ocall_print_int(num); }
 
 // void printint(const int num) { ocall_print_int(num); }
