@@ -21,7 +21,7 @@ all: ../interface/libenclave_stub_u.a app
 
 ../interface/libenclave_stub_u.a: ../interface/enclave.edl
 
-app: app.o globals.o ocall_print_string.o decode_sgx_status.o enclave.o buffers.o enclave_state.o endianswap.o readfile.o ecall_buffer.o keygen.o sign.o open_file.o hexutil.o base64.o quote.o admin.o ecall_buffer_elgamal.o elgamal_buffers.o enclave_state_elgamal.o
+app: app.o globals.o ocall_print_string.o decode_sgx_status.o enclave.o buffers.o enclave_state.o endianswap.o readfile.o ecall_buffer.o keygen.o sign.o open_file.o hexutil.o base64.o quote.o admin.o ecall_buffer_elgamal.o elgamal_buffers.o enclave_state_elgamal.o init.o open.o cast.o close.o tally.o
 #ocall_print_int.o
 
 clean:

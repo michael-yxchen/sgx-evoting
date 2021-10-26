@@ -37,7 +37,27 @@ enclave
 				public sgx_status_t ecall_calc_elgamal_buffer_sizes(
             [out] size_t* e_elgamal_key_buffer_size,
             [out] size_t* e_sealed_elgamal_key_buffer_size);
-
+						
+				public sgx_status_t ecall_init(
+            [out, size=sealed_key_size] char *sealedkey,
+            size_t sealed_key_size);
+						
+				public sgx_status_t ecall_open(
+            [out, size=sealed_key_size] char *sealedkey,
+            size_t sealed_key_size);
+						
+				public sgx_status_t ecall_cast(
+            [out, size=sealed_key_size] char *sealedkey,
+            size_t sealed_key_size);
+						
+				public sgx_status_t ecall_close(
+            [out, size=sealed_key_size] char *sealedkey,
+            size_t sealed_key_size);
+						
+				public sgx_status_t ecall_tally(
+            [out, size=sealed_key_size] char *sealedkey,
+            size_t sealed_key_size);
+						
         public sgx_status_t ecall_unseal_and_sign(
             [in, size=msg_size] uint8_t * msg,
             uint32_t msg_size,

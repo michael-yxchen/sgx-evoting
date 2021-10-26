@@ -40,3 +40,29 @@ bool save_enclave_state_elgamal(const char *const sealedkey_file) {
 
     return ret_status;
 }
+
+bool load_sealedkey(const char *const sealedkey_file) {
+    printf("[GatewayApp]: Loading sealed elgamal key\n");
+    // bool ret_status = load_sealed_data(sealedpubkey_file,
+    // sealed_pubkey_buffer,
+    //                                   sealed_pubkey_buffer_size);
+    // return ret_status;
+    void *new_buffer;
+    size_t new_buffer_size;
+
+    bool ret_status =
+        read_file_into_memory(sealedkey_file, &new_buffer, &new_buffer_size);
+
+    /* If we previously allocated a buffer, free it before putting new one in
+     * its place */
+    if (sealed_elgamal_key_buffer != NULL) {
+        free(sealed_elgamal_key_buffer);
+        sealed_elgamal_key_buffer = NULL;
+    }
+
+    /* Put new buffer into context */
+    sealed_elgamal_key_buffer = new_buffer;
+    sealed_elgamal_key_buffer_size = new_buffer_size;
+
+    return ret_status;
+}

@@ -36,14 +36,30 @@ extern void *signature_buffer;
 extern size_t signature_buffer_size;
 extern void *input_buffer;
 extern size_t input_buffer_size;
-extern void *quote_buffer;
-extern size_t quote_buffer_size;
 
 // HELIOS
 extern void *elgamal_key_buffer;
 extern size_t elgamal_key_buffer_size;
 extern void *sealed_elgamal_key_buffer;
 extern size_t sealed_elgamal_key_buffer_size;
+
+extern void *ballot_buffer;
+extern size_t ballot_buffer_size;
+extern void *admin_key_buffer;
+extern size_t admin_key_buffer_size;
+extern void *voter1_key_buffer;
+extern size_t voter1_key_buffer_size;
+extern void *voter2_key_buffer;
+extern size_t voter2_key_buffer_size;
+extern void *voter3_key_buffer;
+extern size_t voter3_key_buffer_size;
+
+extern void *admin_sign_buffer;
+extern size_t admin_sign_buffer_size;
+extern void *user_sign_buffer;
+extern size_t user_sign_buffer_size;
+extern void *election_hash_buffer;
+extern size_t election_hash_buffer_size;
 
 /* Function prototypes */
 
@@ -80,6 +96,8 @@ bool enclave_generate_key_elgamal(void);
 bool enclave_get_elgamal_buffer_sizes(void);
 bool allocate_elgamal_buffers(void);
 bool save_enclave_state_elgamal(const char *const sealedkey_file);
+bool load_sealedkey(const char *const sealedkey_file);
+bool enclave_init_election(void);
 
 bool enclave_generate_quote(sgx_report_data_t report_data);
 bool enclave_gen_quote();
