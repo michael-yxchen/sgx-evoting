@@ -33,42 +33,42 @@ enclave
             [out] size_t* esealedprivkey_size,
             [out] size_t* esignature_size);
 					
-				// [HELIOS]
-				public sgx_status_t ecall_calc_elgamal_buffer_sizes(
+        // [HELIOS]
+        public sgx_status_t ecall_calc_elgamal_buffer_sizes(
             [out] size_t* e_elgamal_key_buffer_size,
             [out] size_t* e_sealed_elgamal_key_buffer_size);
 						
-				public sgx_status_t ecall_init(
+        public sgx_status_t ecall_init(
             [in, size=sealed_key_size] char *sealedkey,
             size_t sealed_key_size,
-						[in, size=ballot_buffer_size] char *ballot_buffer,
-						size_t ballot_buffer_size,
-						[in, size=admin_key_buffer_size] char *admin_key_buffer,
-						size_t admin_key_buffer_size,
-						[in, size=voter1_key_buffer_size] char *voter1_key_buffer,
-						size_t voter1_key_buffer_size,
-						[in, size=voter2_key_buffer_size] char *voter2_key_buffer,
-						size_t voter2_key_buffer_size,
-						[in, size=voter3_key_buffer_size] char *voter3_key_buffer,
-						size_t voter3_key_buffer_size,
-						[out, size=bulletin_buffer_size] char *bulletin_buffer,
-						size_t bulletin_buffer_size,
-						[out, size=sealed_election_buffer_size] char *sealed_election_buffer,
-						size_t sealed_election_buffer_size);
+            [in, size=ballot_buffer_size] char *ballot_buffer,
+            size_t ballot_buffer_size,
+            [in, size=admin_key_buffer_size] char *admin_key_buffer,
+            size_t admin_key_buffer_size,
+            [in, size=voter1_key_buffer_size] char *voter1_key_buffer,
+            size_t voter1_key_buffer_size,
+            [in, size=voter2_key_buffer_size] char *voter2_key_buffer,
+            size_t voter2_key_buffer_size,
+            [in, size=voter3_key_buffer_size] char *voter3_key_buffer,
+            size_t voter3_key_buffer_size,
+            [out, size=bulletin_buffer_size] char *bulletin_buffer,
+            size_t bulletin_buffer_size,
+            [out, size=sealed_election_buffer_size] char *sealed_election_buffer,
+            size_t sealed_election_buffer_size);
 				
-				public sgx_status_t ecall_open(
+        public sgx_status_t ecall_open(
             [in, size=sealed_key_size] char *sealedkey,
             size_t sealed_key_size);
 						
-				public sgx_status_t ecall_cast(
+        public sgx_status_t ecall_cast(
             [out, size=sealed_key_size] char *sealedkey,
             size_t sealed_key_size);
 						
-				public sgx_status_t ecall_close(
+        public sgx_status_t ecall_close(
             [out, size=sealed_key_size] char *sealedkey,
             size_t sealed_key_size);
 						
-				public sgx_status_t ecall_tally(
+        public sgx_status_t ecall_tally(
             [out, size=sealed_key_size] char *sealedkey,
             size_t sealed_key_size);
 						

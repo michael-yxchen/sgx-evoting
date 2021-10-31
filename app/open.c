@@ -16,21 +16,18 @@
 #include "app.h"
 
 bool enclave_open_election() {
-    sgx_status_t ecall_retval = SGX_ERROR_UNEXPECTED;
+  sgx_status_t ecall_retval = SGX_ERROR_UNEXPECTED;
 
-    printf("[GatewayApp]: Calling OPEN ecall to open election\n");
+  printf("[GatewayApp]: Calling OPEN ecall to open election\n");
 
-    sgx_lasterr = ecall_open(
-        enclave_id, &ecall_retval, (char *)sealed_elgamal_key_buffer,
-        sealed_elgamal_key_buffer_size);
-    if (sgx_lasterr == SGX_SUCCESS && (ecall_retval != SGX_SUCCESS)) {
-        fprintf(stderr,
-                "[GatewayApp]: ERROR: ecall_open returned %d\n",
-                ecall_retval);
-        sgx_lasterr = SGX_ERROR_UNEXPECTED;
-    }
+  sgx_lasterr =
+      ecall_open(enclave_id, &ecall_retval, (char *)sealed_elgamal_key_buffer,
+                 sealed_elgamal_key_buffer_size);
+  if (sgx_lasterr == SGX_SUCCESS && (ecall_retval != SGX_SUCCESS)) {
+    fprintf(stderr, "[GatewayApp]: ERROR: ecall_open returned %d\n",
+            ecall_retval);
+    sgx_lasterr = SGX_ERROR_UNEXPECTED;
+  }
 
-    return (sgx_lasterr == SGX_SUCCESS);
+  return (sgx_lasterr == SGX_SUCCESS);
 }
-
-

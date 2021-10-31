@@ -20,8 +20,8 @@
 extern "C" {
 #endif
 
-void print(const char*);
-void print_int(const int*);
+void print(const char *);
+void print_int(const int *);
 
 #if defined(__cplusplus)
 }

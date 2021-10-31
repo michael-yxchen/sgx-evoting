@@ -67,3 +67,4 @@ interface/*.c
 
 # enclave key
 enclave/enclave.key.pem
+app/app

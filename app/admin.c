@@ -16,26 +16,25 @@
 #include "app.h"
 
 bool enclave_generate_key_elgamal() {
-    sgx_status_t ecall_retval = SGX_ERROR_UNEXPECTED;
+  sgx_status_t ecall_retval = SGX_ERROR_UNEXPECTED;
 
-    printf("[GatewayApp]: Calling ELGAMAL enclave to generate key material\n");
+  printf("[GatewayApp]: Calling ELGAMAL enclave to generate key material\n");
 
-    /*
-     * Invoke ECALL, 'ecall_key_gen_and_seal_elgamal()', to generate a keypair and seal
-     * it to the enclave.
-     */
-    //sgx_lasterr = ecall_key_gen_and_seal_elgamal(
-    sgx_lasterr = ecall_key_gen_and_seal_all_elgamal(
-        enclave_id, &ecall_retval, (char *)sealed_elgamal_key_buffer,
-        sealed_elgamal_key_buffer_size);
-    if (sgx_lasterr == SGX_SUCCESS && (ecall_retval != SGX_SUCCESS)) {
-        fprintf(stderr,
-                "[GatewayApp]: ERROR: ecall_key_gen_and_seal_all_elgamal returned %d\n",
-                ecall_retval);
-        sgx_lasterr = SGX_ERROR_UNEXPECTED;
-    }
+  /*
+   * Invoke ECALL, 'ecall_key_gen_and_seal_elgamal()', to generate a keypair
+   * and seal it to the enclave.
+   */
+  // sgx_lasterr = ecall_key_gen_and_seal_elgamal(
+  sgx_lasterr = ecall_key_gen_and_seal_all_elgamal(
+      enclave_id, &ecall_retval, (char *)sealed_elgamal_key_buffer,
+      sealed_elgamal_key_buffer_size);
+  if (sgx_lasterr == SGX_SUCCESS && (ecall_retval != SGX_SUCCESS)) {
+    fprintf(stderr,
+            "[GatewayApp]: ERROR: ecall_key_gen_and_seal_all_elgamal "
+            "returned %d\n",
+            ecall_retval);
+    sgx_lasterr = SGX_ERROR_UNEXPECTED;
+  }
 
-    return (sgx_lasterr == SGX_SUCCESS);
+  return (sgx_lasterr == SGX_SUCCESS);
 }
-
-
