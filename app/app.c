@@ -54,19 +54,19 @@ bool load_init_files(const char *const ballot_file,
   ret = read_file_into_memory(ballot_file, &ballot_buffer, &ballot_buffer_size);
   printf("%s\n", ret ? "true" : "false");
   printf("[GatewayApp]: Loading INIT admin file = ");
-  ret = read_file_into_memory(admin_file, &admin_key_buffer,
+  ret = read_pem_pubkey(admin_file, &admin_key_buffer,
                               &admin_key_buffer_size);
   printf("%s\n", ret ? "true" : "false");
   printf("[GatewayApp]: Loading INIT voter1 file = ");
-  ret = read_file_into_memory(voter1_file, &voter1_key_buffer,
+  ret = read_pem_pubkey(voter1_file, &voter1_key_buffer,
                               &voter1_key_buffer_size);
   printf("%s\n", ret ? "true" : "false");
   printf("[GatewayApp]: Loading INIT voter2 file = ");
-  ret = read_file_into_memory(voter2_file, &voter2_key_buffer,
+  ret = read_pem_pubkey(voter2_file, &voter2_key_buffer,
                               &voter2_key_buffer_size);
   printf("%s\n", ret ? "true" : "false");
   printf("[GatewayApp]: Loading INIT voter3 file = ");
-  ret = read_file_into_memory(voter3_file, &voter3_key_buffer,
+  ret = read_pem_pubkey(voter3_file, &voter3_key_buffer,
                               &voter3_key_buffer_size);
   printf("%s\n", ret ? "true" : "false");
   return ret;

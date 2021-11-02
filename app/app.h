@@ -97,6 +97,8 @@ bool enclave_sign_data(void);
 bool enclave_generate_key(void);
 
 // [HELIOS]
+bool read_pem_pubkey(const char *const filename, void **buffer,
+                     size_t *buffer_size);
 bool enclave_generate_key_elgamal(void);
 bool enclave_get_elgamal_buffer_sizes(void);
 bool allocate_elgamal_buffers(void);
