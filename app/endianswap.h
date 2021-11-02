@@ -1,5 +1,5 @@
-#ifndef ENDIANSWAP_H
-#define ENDIANSWAP_H
+#ifndef _ENDIANSWAP_H
+#define _ENDIANSWAP_H
 #include <stdint.h>
 /**
  * Macros for little to big endian conversion.

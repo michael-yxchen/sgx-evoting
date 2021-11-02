@@ -7,6 +7,7 @@
 #include <stdarg.h>
 #include <stdio.h>
 
+#include "election_state.h"
 #include "enclave.h"
 #include <enclave_t.h>
 
@@ -17,7 +18,6 @@
 #include <sgx_tcrypto.h>
 #include <sgx_tseal.h>
 #include <sgx_utils.h>
-
 /**
  * This function generates a key pair and then seals the private key.
  *
@@ -52,7 +52,9 @@ sgx_status_t ecall_init(char *sealed, size_t sealed_size,
   // Step 1: Calculate sealed/encrypted data length.
   uint32_t unsealed_data_size =
       sgx_get_encrypt_txt_len((const sgx_sealed_data_t *)sealed);
-
+  int ballot_off = 0;
+  size_t opt_off = 0;
+  election_state_t election_state = {0};
   /*
   int x = unsealed_data_size;
   int length = snprintf( NULL, 0, "%d", x );
@@ -75,7 +77,6 @@ sgx_status_t ecall_init(char *sealed, size_t sealed_size,
                              unsealed_data, &unsealed_data_size)) !=
       SGX_SUCCESS) {
     print("\nTrustedApp: sgx_unseal_data() failed !\n");
-
     goto cleanup;
   }
 
@@ -98,85 +99,84 @@ sgx_status_t ecall_init(char *sealed, size_t sealed_size,
 
   print("\n[TrustedApp]: INIT completed\n");
 
-  char election_state[728];
-  size_t buf_sz = 728;
-
-  for (int j = 0; j < 64; j++) {
-    election_state[j] = ((char *)admin_key_buffer)[27 + j];
-  }
-  for (int j = 0; j < 60; j++) {
-    election_state[64 + j] = ((char *)admin_key_buffer)[92 + j];
+  assert(sizeof(election_state.admin_pk) == admin_key_buffer_size);
+  for (size_t i = 0; i < sizeof(election_state.admin_pk); ++i) {
+    election_state.admin_pk[i] = ((uint8_t *)admin_key_buffer)[i];
   }
 
-  for (int j = 0; j < 64; j++) {
-    election_state[128 + j] = ((char *)voter1_key_buffer)[27 + j];
-  }
-  for (int j = 0; j < 60; j++) {
-    election_state[128 + 64 + j] = ((char *)voter1_key_buffer)[92 + j];
+  assert(sizeof(election_state.v1_pk) == voter1_key_buffer_size);
+  for (size_t i = 0; i < sizeof(election_state.v1_pk); ++i) {
+    election_state.v1_pk[i] = ((uint8_t *)voter1_key_buffer)[i];
   }
 
-  for (int j = 0; j < 64; j++) {
-    election_state[256 + j] = ((char *)voter2_key_buffer)[27 + j];
-  }
-  for (int j = 0; j < 60; j++) {
-    election_state[256 + 64 + j] = ((char *)voter2_key_buffer)[92 + j];
+  assert(sizeof(election_state.v2_pk) == voter2_key_buffer_size);
+  for (size_t i = 0; i < sizeof(election_state.v2_pk); ++i) {
+    election_state.v2_pk[i] = ((uint8_t *)voter2_key_buffer)[i];
   }
 
-  for (int j = 0; j < 64; j++) {
-    election_state[384 + j] = ((char *)voter3_key_buffer)[27 + j];
-  }
-  for (int j = 0; j < 60; j++) {
-    election_state[384 + 64 + j] = ((char *)voter3_key_buffer)[92 + j];
+  assert(sizeof(election_state.v3_pk) == voter3_key_buffer_size);
+  for (size_t i = 0; i < sizeof(election_state.v3_pk); ++i) {
+    election_state.v3_pk[i] = ((uint8_t *)voter3_key_buffer)[i];
   }
 
-  election_state[512] = ((char *)ballot_buffer)[0];
+  election_state.ballot_len = ((uint8_t *)ballot_buffer)[0];
+  ballot_off += 2;
 
-  for (int j = 0; j < 16; j++) {
-    if (((char *)ballot_buffer)[2 + j] != '\n') {
-      election_state[516 + j] = ((char *)ballot_buffer)[2 + j];
-    } else {
-      break;
+  opt_off = 0;
+  while (ballot_buffer[ballot_off] != '\n') {
+    if (opt_off < sizeof(election_state.opt1)) {
+      election_state.opt1[opt_off] = ballot_buffer[ballot_off];
+      ++opt_off;
     }
+    ++ballot_off;
   }
+  ++ballot_off;
 
-  for (int j = 0; j < 16; j++) {
-    if (((char *)ballot_buffer)[10 + j] != '\n') {
-      election_state[532 + j] = ((char *)ballot_buffer)[10 + j];
-    } else {
-      break;
+  opt_off = 0;
+  while (ballot_buffer[ballot_off] != '\n') {
+    if (opt_off < sizeof(election_state.opt2)) {
+      election_state.opt2[opt_off] = ballot_buffer[ballot_off];
+      ++opt_off;
     }
+    ++ballot_off;
   }
+  ++ballot_off;
 
-  for (int j = 0; j < 16; j++) {
-    if (((char *)ballot_buffer)[16 + j] != '\n') {
-      election_state[548 + j] = ((char *)ballot_buffer)[16 + j];
-    } else {
-      break;
+  opt_off = 0;
+  while (ballot_buffer[ballot_off] != '\n') {
+    if (opt_off < sizeof(election_state.opt3)) {
+      election_state.opt3[opt_off] = ballot_buffer[ballot_off];
+      ++opt_off;
     }
+    ++ballot_off;
+  }
+  ++ballot_off;
+
+  for (size_t i = 0; i < sizeof(election_state.p); ++i) {
+    election_state.p[i] = unsealed_data[i];
+    election_state.g[i] = unsealed_data[32 + i];
+    election_state.pk[i] = unsealed_data[64 + i];
+    election_state.sk[i] = unsealed_data[96 + i];
   }
 
-  for (int j = 0; j < 128; j++) {
-    election_state[564 + j] = unsealed_data[j];
+  if ((ret = sgx_sha256_msg(
+           (const uint8_t*)&election_state,
+           (char *)&(election_state.sk) - (char *)&election_state,
+           (sgx_sha256_hash_t *)&election_state.election_hash)) !=
+      SGX_SUCCESS) {
+    print("\nTrustedApp: sgx_sha256_init failed !\n");
+    goto cleanup;
   }
 
-  uint8_t *digest_buffer =
-      (uint8_t *)malloc((uint32_t)sizeof(sgx_sha256_hash_t));
-  sgx_status_t rethash = sgx_sha256_msg((const uint8_t *)election_state, 692,
-                                        (sgx_sha256_hash_t *)digest_buffer);
+  election_state.state_counter = vt_registered;
 
-  for (int j = 0; j < 32; j++) {
-    election_state[692 + j] = digest_buffer[j];
-  }
-
-  election_state[724] = 1;
-
-  int temp = sgx_calc_sealed_data_size(0U, sizeof(election_state));
-  int x = temp;
-  int length = snprintf(NULL, 0, "%d", x);
-  char *str = malloc(length + 1);
-  snprintf(str, length + 1, "%d", x);
-  print(str);
-  free(str);
+  // int temp = sgx_calc_sealed_data_size(0U, sizeof(election_state));
+  // int x = temp;
+  // int length = snprintf(NULL, 0, "%d", x);
+  // char *str = malloc(length + 1);
+  // snprintf(str, length + 1, "%d", x);
+  // print(str);
+  // free(str);
 
   // Step 3: Calculate sealed data size.
   if (sealed_election_buffer_size >=
@@ -196,22 +196,33 @@ sgx_status_t ecall_init(char *sealed, size_t sealed_size,
     goto cleanup;
   }
 
-  for (int j = 0; j < 32; j++) {
-    bulletin_buffer[j] = digest_buffer[j];
-  }
+  {
+    bulletin_board_t *bb = (bulletin_board_t *)bulletin_buffer;
+    assert(sizeof(bulletin_board_t) <= bulletin_buffer_size);
+    for (size_t i = 0; i < sizeof(election_state.election_hash); ++i) {
+      bb->election_hash[i] = election_state.election_hash[i];
+    }
 
-  for (int j = 0; j < 21; j++) {
-    bulletin_buffer[j + 32] = ballot_buffer[j];
-  }
+    assert(ballot_buffer_size <= sizeof(bb->ballot));
+    for (size_t i = 0; i < ballot_buffer_size; i++) {
+      bb->ballot[i] = ballot_buffer[i];
+    }
 
-  for (int j = 0; j < 96; j++) {
-    bulletin_buffer[j + 64] = unsealed_data[j];
+    for (size_t i = 0; i < sizeof(election_state.p); ++i) {
+      bb->p[i] = election_state.p[i];
+      bb->g[i] = election_state.g[i];
+      bb->pk[i] = election_state.pk[i];
+    }
   }
 
   ret = SGX_SUCCESS;
 
 cleanup:
   // Step 4: Close Context.
+  if (unsealed_data) {
+    free(unsealed_data);
+  }
+
 
   return ret;
 }
