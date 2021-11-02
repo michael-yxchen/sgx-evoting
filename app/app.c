@@ -38,6 +38,7 @@ static struct option long_options[] = {
     {"usersign", required_argument, 0, 0},
     {"electionhash", required_argument, 0, 0},
     {"sealedelec", required_argument, 0, 0},
+    {"command", required_argument, 0, 0},
     {0, 0, 0, 0}};
 
 /**
@@ -54,20 +55,19 @@ bool load_init_files(const char *const ballot_file,
   ret = read_file_into_memory(ballot_file, &ballot_buffer, &ballot_buffer_size);
   printf("%s\n", ret ? "true" : "false");
   printf("[GatewayApp]: Loading INIT admin file = ");
-  ret = read_pem_pubkey(admin_file, &admin_key_buffer,
-                              &admin_key_buffer_size);
+  ret = read_pem_pubkey(admin_file, &admin_key_buffer, &admin_key_buffer_size);
   printf("%s\n", ret ? "true" : "false");
   printf("[GatewayApp]: Loading INIT voter1 file = ");
-  ret = read_pem_pubkey(voter1_file, &voter1_key_buffer,
-                              &voter1_key_buffer_size);
+  ret =
+      read_pem_pubkey(voter1_file, &voter1_key_buffer, &voter1_key_buffer_size);
   printf("%s\n", ret ? "true" : "false");
   printf("[GatewayApp]: Loading INIT voter2 file = ");
-  ret = read_pem_pubkey(voter2_file, &voter2_key_buffer,
-                              &voter2_key_buffer_size);
+  ret =
+      read_pem_pubkey(voter2_file, &voter2_key_buffer, &voter2_key_buffer_size);
   printf("%s\n", ret ? "true" : "false");
   printf("[GatewayApp]: Loading INIT voter3 file = ");
-  ret = read_pem_pubkey(voter3_file, &voter3_key_buffer,
-                              &voter3_key_buffer_size);
+  ret =
+      read_pem_pubkey(voter3_file, &voter3_key_buffer, &voter3_key_buffer_size);
   printf("%s\n", ret ? "true" : "false");
   return ret;
 }
@@ -77,6 +77,24 @@ bool load_adminsign(const char *const admin_file) {
   printf("[GatewayApp]: Loading Signed Admin Command file = ");
   ret = read_file_into_memory(admin_file, &admin_sign_buffer,
                               &admin_sign_buffer_size);
+  printf("%s\n", ret ? "true" : "false");
+  return ret;
+}
+
+bool load_command_file(const char *const command_file) {
+  bool ret = false;
+  printf("[GatewayApp]: Loading Command file = ");
+  ret = read_file_into_memory(command_file, &command_buffer,
+                              &command_buffer_size);
+  printf("%s\n", ret ? "true" : "false");
+  return ret;
+}
+
+bool load_election_state(const char *const election_state_file) {
+  bool ret = false;
+  printf("[GatewayApp]: Loading Command file = ");
+  ret = read_file_into_memory(election_state_file, &sealed_election_buffer,
+                              &sealed_election_buffer_size);
   printf("%s\n", ret ? "true" : "false");
   return ret;
 }
@@ -132,6 +150,7 @@ int main(int argc, char **argv) {
   const char *opt_election_hash = NULL;
 
   const char *opt_sealedelection_file = NULL;
+  const char *opt_command_file = NULL;
 
   int option_index = 0;
 
@@ -221,7 +240,7 @@ int main(int argc, char **argv) {
       break;
 
     case 26:
-      opt_bulletin_file = optarg;
+      opt_command_file = optarg;
       break;
     }
   }
@@ -292,7 +311,8 @@ int main(int argc, char **argv) {
     return EXIT_FAILURE;
   }
 
-  if (opt_open && (!opt_enclave_path || !opt_adminsign_file)) {
+  if (opt_open &&
+      (!opt_enclave_path || !opt_adminsign_file || !opt_command_file)) {
     fprintf(stderr, "UsageOpen:\n");
     fprintf(stderr, "  %s --open --enclave-path --adminsign command.txt\n",
             argv[0]);
@@ -351,6 +371,8 @@ int main(int argc, char **argv) {
       (opt_init ? save_bulletin(opt_bulletin_file) : true) &&
       // open
       (opt_open ? load_adminsign(opt_adminsign_file) : true) &&
+      (opt_open ? load_command_file(opt_command_file) : true) &&
+      (opt_open ? load_election_state(opt_sealedelection_file) : true) &&
       (opt_open ? enclave_open_election() : true) &&
       // cast
       (opt_cast ? load_usersign(opt_usersign_file) : true) &&

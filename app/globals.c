@@ -57,3 +57,6 @@ size_t bulletin_buffer_size;
 
 void *sealed_election_buffer;
 size_t sealed_election_buffer_size;
+
+void* command_buffer;
+size_t command_buffer_size;

@@ -66,6 +66,9 @@ extern size_t bulletin_buffer_size;
 extern void *sealed_election_buffer;
 extern size_t sealed_election_buffer_size;
 
+extern void* command_buffer;
+extern size_t command_buffer_size;
+
 /* Function prototypes */
 
 const char *decode_sgx_status(sgx_status_t status);

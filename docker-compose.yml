@@ -42,8 +42,10 @@ services:
       - ./enclave:/usr/src/sgxvoting/enclave
       - ./interface:/usr/src/sgxvoting/interface
       - ./trustedLib:/usr/src/sgxvoting/trustedLib
-      - ./run_demo_sgxra.sh:/usr/src/sgxvoting/run_demo_sgxra.sh
+      # - ./run_demo_sgxra.sh:/usr/src/sgxvoting/run_demo_sgxra.sh
       - ./test.sh:/usr/src/sgxvoting/test.sh
+      - ./run_election.sh:/usr/src/sgxvoting/run_election.sh
+      - ./demo_sgx:/usr/src/sgxvoting/demo_sgx
     command: bash
 
 volumes:
