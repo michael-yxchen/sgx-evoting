@@ -31,7 +31,9 @@ enclave
             [out] size_t* epubkey_size,
             [out] size_t* esealedpubkey_size,
             [out] size_t* esealedprivkey_size,
-            [out] size_t* esignature_size);
+            [out] size_t* esignature_size,
+            [out] size_t* esealed_election_buffer_size,
+            [out] size_t* ebulletin_size);
 					
         // [HELIOS]
         public sgx_status_t ecall_calc_elgamal_buffer_sizes(

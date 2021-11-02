@@ -25,10 +25,8 @@ bool allocate_elgamal_buffers() {
 
 bool allocate_election_buffers() {
   printf("[GatewayApp]: Allocating ElGamal buffers\n");
-  sealed_election_buffer_size = 1288;
   sealed_election_buffer = calloc(sealed_election_buffer_size, 1);
 
-  bulletin_buffer_size = 192;
   bulletin_buffer = calloc(bulletin_buffer_size, 1);
 
   if (sealed_election_buffer == NULL) {
