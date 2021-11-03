@@ -61,8 +61,9 @@ enclave
         public sgx_status_t ecall_open(
             [in, size=cmd_size] char *cmd, size_t cmd_size, 
             [in, size=signature_size]char *signature, size_t signature_size,
-            [user_check]char *sealed_election_state_buffer,
+            [in, size=sealed_election_state_buffer_size]char *sealed_election_state_buffer,
                         size_t sealed_election_state_buffer_size);
+
 						
         public sgx_status_t ecall_cast(
             [out, size=sealed_key_size] char *sealedkey,

@@ -22,10 +22,11 @@ extern "C" {
 
 void print(const char *);
 void print_int(const int *);
-sgx_status_t verify_signature(uint8_t *msg, uint32_t msg_size, uint8_t *pubkey,
-                      size_t pubkey_size, char *signature,
-                      size_t signature_size, uint8_t *result);
+void printf(const char *fmt, ...);
 
+sgx_status_t verify_signature(uint8_t *msg, uint32_t msg_size, uint8_t *pubkey,
+                              size_t pubkey_size, char *signature,
+                              size_t signature_size, uint8_t *result);
 #if defined(__cplusplus)
 }
 #endif

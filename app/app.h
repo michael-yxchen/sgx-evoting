@@ -66,7 +66,7 @@ extern size_t bulletin_buffer_size;
 extern void *sealed_election_buffer;
 extern size_t sealed_election_buffer_size;
 
-extern void* command_buffer;
+extern void *command_buffer;
 extern size_t command_buffer_size;
 
 /* Function prototypes */
@@ -109,7 +109,8 @@ bool save_enclave_state_elgamal(const char *const sealedkey_file);
 bool load_sealedkey(const char *const sealedkey_file);
 bool enclave_init_election(void);
 bool allocate_election_buffers(void);
-
+bool read_der_signature(const char *const filename, void **buffer,
+                        size_t *buffer_size);
 bool enclave_generate_quote(sgx_report_data_t report_data);
 bool enclave_gen_quote();
 

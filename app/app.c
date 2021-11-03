@@ -74,9 +74,9 @@ bool load_init_files(const char *const ballot_file,
 
 bool load_adminsign(const char *const admin_file) {
   bool ret = false;
-  printf("[GatewayApp]: Loading Signed Admin Command file = ");
-  ret = read_file_into_memory(admin_file, &admin_sign_buffer,
-                              &admin_sign_buffer_size);
+  printf("[GatewayApp]: Loading Admin Signature file = ");
+  ret = read_der_signature(admin_file, &admin_sign_buffer, &admin_sign_buffer_size);
+ 
   printf("%s\n", ret ? "true" : "false");
   return ret;
 }

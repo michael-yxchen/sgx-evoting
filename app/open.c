@@ -22,8 +22,8 @@ bool enclave_open_election() {
 
   sgx_lasterr =
       ecall_open(enclave_id, &ecall_retval, command_buffer, command_buffer_size,
-                 signature_buffer, signature_buffer_size,
-                 sealed_election_buffer, sealed_election_buffer_size);
+                 admin_sign_buffer, admin_sign_buffer_size, sealed_election_buffer,
+                 sealed_election_buffer_size);
   if (sgx_lasterr == SGX_SUCCESS && (ecall_retval != SGX_SUCCESS)) {
     fprintf(stderr, "[GatewayApp]: ERROR: ecall_open returned %d\n",
             ecall_retval);

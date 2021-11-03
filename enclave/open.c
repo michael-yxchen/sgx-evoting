@@ -26,7 +26,6 @@ sgx_status_t ecall_open(char *cmd, size_t cmd_size, char *signature,
   sgx_status_t ret = SGX_ERROR_UNEXPECTED;
   election_state_t *election_state = NULL;
   uint32_t election_state_size = sizeof(*election_state);
-  // int rv = -1;
 
   // Unseal election state
   if (sealed_election_state_buffer == NULL ||
@@ -50,7 +49,7 @@ sgx_status_t ecall_open(char *cmd, size_t cmd_size, char *signature,
     goto cleanup;
   }
   memset_s(election_state, sizeof(*election_state), 0, sizeof(*election_state));
-  
+
   if ((ret = sgx_unseal_data((sgx_sealed_data_t *)sealed_election_state_buffer,
                              NULL, NULL, (uint8_t *)election_state,
                              &election_state_size)) != SGX_SUCCESS) {
@@ -69,9 +68,9 @@ sgx_status_t ecall_open(char *cmd, size_t cmd_size, char *signature,
       print("\nTrustedApp: verify_signature failed !\n");
       goto cleanup;
     }
-    print("Signature verification result: ");
-    print_int((int *)&result);
+    printf("Signature verification result: %s", result == SGX_EC_VALID ? "True" : "False");
   }
+
   // Check command
 
   // Increment election state counter

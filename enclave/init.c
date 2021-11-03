@@ -160,7 +160,7 @@ sgx_status_t ecall_init(char *sealed, size_t sealed_size,
   }
 
   if ((ret = sgx_sha256_msg(
-           (const uint8_t*)&election_state,
+           (const uint8_t *)&election_state,
            (char *)&(election_state.sk) - (char *)&election_state,
            (sgx_sha256_hash_t *)&election_state.election_hash)) !=
       SGX_SUCCESS) {
@@ -222,7 +222,6 @@ cleanup:
   if (unsealed_data) {
     free(unsealed_data);
   }
-
 
   return ret;
 }

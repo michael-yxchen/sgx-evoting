@@ -15,9 +15,9 @@
  *
  * @param msg Input parameter for message whose signature is to be verified
  * @param msg_size Input parameter for size of msg
- * @param pubkey Input parameter for sealed public key
+ * @param pubkey Input parameter for public key
  * @param pubkey_size Input parameter for size of pubkey
- * @param signature Input parameter for sealed signature
+ * @param signature Input parameter for signature
  * @param signature_size Input parameter for size of signature
  * @param result The verification result: 0 means success
  * @return sgx_status_t SGX_SUCCESS (Error code = 0x0000) on success, some other
@@ -32,13 +32,13 @@ sgx_status_t verify_signature(uint8_t *msg, uint32_t msg_size, uint8_t *pubkey,
   print("\nTrustedApp: Received sensor data, sealed public key, and "
         "signature.\n");
 
-  // Step 5: Open Context.
+  // Open Context.
   if ((ret = sgx_ecc256_open_context(&p_ecc_handle)) != SGX_SUCCESS) {
     print("\nTrustedApp: sgx_ecc256_open_context() failed !\n");
     goto cleanup;
   }
 
-  // Step 6: Perform ECDSA verification.
+  // Perform ECDSA verification.
   if ((ret = sgx_ecdsa_verify(msg, msg_size, (sgx_ec256_public_t *)pubkey,
                               (sgx_ec256_signature_t *)signature, result,
                               p_ecc_handle)) != SGX_SUCCESS) {
