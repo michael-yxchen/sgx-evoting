@@ -1,0 +1,34 @@
+{
+    "0": "d04b98f48e8f8bcc15c6ae5ac050801cd6dcfd428fb5f9e65c4e16e7807340fa",
+    "1": [
+        {
+            "question": "Who should be the next president?",
+            "choice": [
+                "Obama",
+                "Trump"
+            ]
+        },
+        {
+            "question": "Who should be the next mayor?",
+            "choice": [
+                "John",
+                "Joe"
+            ]
+        }
+    ],
+    "2": [
+        "d04b98f48e8f8bcc15c6ae5ac050801cd6dcfd428fb5f9e65c4e16e7807340f1",
+        "d04b98f48e8f8bcc15c6ae5ac050801cd6dcfd428fb5f9e65c4e16e7807340f2",
+        "d04b98f48e8f8bcc15c6ae5ac050801cd6dcfd428fb5f9e65c4e16e7807340f3"
+    ],
+    "3": [
+        "{ command: open }",
+        "d04b98f48e8f8bcc15c6ae5ac050801cd6dcfd428fb5f9e65c4e16e7807340f3d04b98f48e8f8bcc15c6ae5ac050801cd6dcfd428fb5f9e65c4e16e7807340f3"
+    ],
+    "4": "-----BEGIN PUBLIC KEY-----\nMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEKF9ksGYM5cKgEYe4OgxkI16avwm3\ntf3pbA0ZIDSSPuhyAKKaXWzrj6KsvLo5Sj2NAyTnvTTrfosY3SBNIe2hew==\n-----END PUBLIC KEY-----\n",
+    "5": [
+        "-----BEGIN PUBLIC KEY-----\nMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEKF9ksGYM5cKgEYe4OgxkI16avwm3\ntf3pbA0ZIDSSPuhyAKKaXWzrj6KsvLo5Sj2NAyTnvTTrfosY3SBNIe2hew==\n-----END PUBLIC KEY-----\n",
+        "-----BEGIN PUBLIC KEY-----\nMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEKF9ksGYM5cKgEYe4OgxkI16avwm3\ntf3pbA0ZIDSSPuhyAKKaXWzrj6KsvLo5Sj2NAyTnvTTrfosY3SBNIe2hew==\n-----END PUBLIC KEY-----\n",
+        "-----BEGIN PUBLIC KEY-----\nMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEKF9ksGYM5cKgEYe4OgxkI16avwm3\ntf3pbA0ZIDSSPuhyAKKaXWzrj6KsvLo5Sj2NAyTnvTTrfosY3SBNIe2hew==\n-----END PUBLIC KEY-----\n"
+    ]
+}
