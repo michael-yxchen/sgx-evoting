@@ -42,8 +42,8 @@ Barrack
 Biden
 Trump' > ballot.txt
 echo "Ballot created for 3 candidates: Barrack, Joe, Donald.\n"
-
 # Admin invoking the Ecall to initialize the election
+
 ../app/app --init \
     --enclave-path `pwd`/../enclave/enclave.signed.so \
 		--sealedkey sealedkey.bin \
@@ -57,18 +57,18 @@ echo "Ballot created for 3 candidates: Barrack, Joe, Donald.\n"
 #open sealed key, initialize state counter to 1, save admin public key, save pks of eligible voters, save ballot, seal meta data, compute hash metadata(-counter)+PK, save election identifier
 
 
-
 # Admin invoking the Ecall to open the election
 echo '{ command: open }' > open_command.json
 echo -n "Signing command with admin key.."
-openssl dgst -sign secp256r1-key.pem -out Open.signature ../open_command.json
+openssl dgst -sign secp256r1-key.pem -out Open.signature open_command.json
 echo ".done"
 
 ../app/app --open \
     --enclave-path `pwd`/../enclave/enclave.signed.so \
-		--adminsign Open.signature
-
-
+		--command open_command.json \
+		--adminsign Open.signature \
+		--sealedelec sealedhelios_state.bin
+# exit
 
 # Observing election hash from bulletin board and saving to seperate file
 head -c 32 bulletin.txt > election.hash
@@ -77,13 +77,17 @@ head -c 32 bulletin.txt > election.hash
 echo '{ vote: 00000010 }' > ballot.json
 ./ballot_preparation_script ballot.json encrypted_ballot_alice.json
 echo -n "Signing ballot with alice's key.."
-openssl dgst -sign alice-key.pem -out EncBallotAlice.signature ../encrypted_ballot_alice.json
+openssl dgst -sign alice-key.pem -out EncBallotAlice.signature encrypted_ballot_alice.json
 echo ".done"
 
 ../app/app --cast \
     --enclave-path `pwd`/../enclave/enclave.signed.so \
+	# --voter-pubkey ..
 		--usersign EncBallotAlice.signature \
-		--electionhash election.hash
+		--electionhash election.hash \
+		--sealedelec sealedhelios_state.bin
+
+
 
 
 
@@ -91,13 +95,15 @@ echo ".done"
 echo '{ vote: 00000100 }' > ballot.json
 ./ballot_preparation_script ballot.json encrypted_ballot_justin.json
 echo -n "Signing ballot with justin's key.."
-openssl dgst -sign justin-key.pem -out EncBallotJustin.signature ../encrypted_ballot_justin.json
+openssl dgst -sign justin-key.pem -out EncBallotJustin.signature encrypted_ballot_justin.json
 echo ".done"
 
 ../app/app --cast \
     --enclave-path `pwd`/../enclave/enclave.signed.so \
 		--usersign EncBallotJustin.signature \
-		--electionhash election.hash
+		--electionhash election.hash \
+		--sealedelec sealedhelios_state.bin
+
 		
 		
 		
@@ -105,20 +111,23 @@ echo ".done"
 echo '{ vote: 00000100 }' > ballot.json
 ./ballot_preparation_script ballot.json encrypted_ballot_john.json
 echo -n "Signing ballot with john's key.."
-openssl dgst -sign john-key.pem -out EncBallotJohn.signature ../encrypted_ballot_john.json
+openssl dgst -sign john-key.pem -out EncBallotJohn.signature encrypted_ballot_john.json
 echo ".done"
 
 ../app/app --cast \
     --enclave-path `pwd`/../enclave/enclave.signed.so \
 		--usersign EncBallotJohn.signature \
-		--electionhash election.hash
+		--electionhash election.hash \
+		--sealedelec sealedhelios_state.bin
+
+
 
 
 
 # Admin invoking the Ecall to close the election
 echo '{ command: close }' > close_command.json
 echo -n "Signing command with admin key.."
-openssl dgst -sign secp256r1-key.pem -out Close.signature ../close_command.json
+openssl dgst -sign secp256r1-key.pem -out Close.signature close_command.json
 echo ".done"
 
 ../app/app --close \
@@ -130,7 +139,7 @@ echo ".done"
 # Admin invoking the Ecall to tally the election
 echo '{ command: tally }' > open_command.json
 echo -n "Signing command with admin key.."
-openssl dgst -sign secp256r1-key.pem -out Open.signature ../open_command.json
+openssl dgst -sign secp256r1-key.pem -out Open.signature open_command.json
 echo ".done"
 
 ../app/app --tally \
