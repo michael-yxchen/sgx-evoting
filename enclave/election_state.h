@@ -3,6 +3,7 @@
 #include <stdint.h>
 
 #define PK_LEN 64
+#define ENC_BALLOT_LEN 64
 
 typedef enum state_ctr {
   vt_created = 0,
@@ -27,6 +28,9 @@ typedef struct __attribute__((packed)) election_state {
   uint8_t sk[32];
   uint8_t election_hash[32];
   uint8_t state_counter;
+  uint8_t v1_ballot[ENC_BALLOT_LEN];
+  uint8_t v2_ballot[ENC_BALLOT_LEN];
+  uint8_t v3_ballot[ENC_BALLOT_LEN];
 } election_state_t;
 
 typedef struct __attribute__((packed)) bulletin_board {
