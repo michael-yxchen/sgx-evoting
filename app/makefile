@@ -7,13 +7,14 @@
 include ../common/common.mk
 include ../common/rules.mk
 
+JSON_C_DIR = /opt/json-c
 SGX_EDGER8R_FLAGS += --untrusted-dir ../interface
 CFLAGS += $(SGX_HOST_CFLAGS) -std=c99
 CXXFLAGS += $(SGX_HOST_CXXFLAGS)
-CPPFLAGS += $(SGX_HOST_CPPFLAGS) -I../interface
+CPPFLAGS += $(SGX_HOST_CPPFLAGS) -I../interface -I$(JSON_C_DIR)/include/json-c
 LDFLAGS += $(SGX_HOST_LDFLAGS)
 # Add to LDFLAGS if enclave_stub_u is a shared library: -Wl,-rpath,../interface -Wl,-rpath,interface
-LDLIBS += -L ../interface -lenclave_stub_u $(SGX_HOST_LDLIBS) -lcrypto -ldl
+LDLIBS += -L ../interface -lenclave_stub_u $(SGX_HOST_LDLIBS) -lcrypto -ldl -L$(JSON_C_DIR)/lib -ljson-c
 
 .PHONY: all clean
 

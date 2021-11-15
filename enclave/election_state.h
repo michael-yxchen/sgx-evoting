@@ -34,9 +34,9 @@ typedef struct __attribute__((packed)) election_state {
 } election_state_t;
 
 typedef struct __attribute__((packed)) bulletin_board {
-	uint8_t election_hash[32];
-	int8_t ballot[32];
-	uint8_t p[32];
+  uint8_t election_hash[32];
+  int8_t ballot[32];
+  uint8_t p[32];
   uint8_t g[32];
   uint8_t pk[32];
 } bulletin_board_t;
