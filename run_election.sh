@@ -73,11 +73,12 @@ echo ".done"
 # Observing election hash from bulletin board and saving to seperate file
 head -c 32 bulletin.txt > election.hash
 
-# Actions Alice would take to cast her vote
-echo '{ vote: 00000010 }' > ballot.json
-./ballot_preparation_script ballot.json encrypted_ballot_alice.json
+# Actions Alice would take to cast her vote 1-2
+#../ballot_prep/bps 
+#../ballot_prep/bulletin-board.json
+#d04b98f48e8f8bcc15c6ae5ac050801cd6dcfd428fb5f9e65c4e16e7807340fa
 echo -n "Signing ballot with alice's key.."
-openssl dgst -sign alice-key.pem -out EncBallotAlice.signature encrypted_ballot_alice.json
+openssl dgst -sign alice-key.pem -out EncBallotAlice.signature ../ballot_prep/encballot_alice.hex
 echo ".done"
 
 ../app/app --cast \
@@ -91,11 +92,12 @@ echo ".done"
 
 
 
-# Actions Justin would take to cast her vote
-echo '{ vote: 00000100 }' > ballot.json
-./ballot_preparation_script ballot.json encrypted_ballot_justin.json
+# Actions Justin would take to cast her vote 2-2
+#../ballot_prep/bps 
+#../ballot_prep/bulletin-board.json
+#d04b98f48e8f8bcc15c6ae5ac050801cd6dcfd428fb5f9e65c4e16e7807340fa
 echo -n "Signing ballot with justin's key.."
-openssl dgst -sign justin-key.pem -out EncBallotJustin.signature encrypted_ballot_justin.json
+openssl dgst -sign justin-key.pem -out EncBallotJustin.signature ../ballot_prep/encballot_justin.hex
 echo ".done"
 
 ../app/app --cast \
@@ -107,11 +109,12 @@ echo ".done"
 		
 		
 		
-# Actions John would take to cast her vote		
-echo '{ vote: 00000100 }' > ballot.json
-./ballot_preparation_script ballot.json encrypted_ballot_john.json
+# Actions John would take to cast her vote 1-2	
+#../ballot_prep/bps 
+#../ballot_prep/bulletin-board.json
+#d04b98f48e8f8bcc15c6ae5ac050801cd6dcfd428fb5f9e65c4e16e7807340fa
 echo -n "Signing ballot with john's key.."
-openssl dgst -sign john-key.pem -out EncBallotJohn.signature encrypted_ballot_john.json
+openssl dgst -sign john-key.pem -out EncBallotJohn.signature ../ballot_prep/encballot_john.hex
 echo ".done"
 
 ../app/app --cast \
