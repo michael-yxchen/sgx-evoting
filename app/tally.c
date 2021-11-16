@@ -21,8 +21,7 @@ bool enclave_tally_election() {
   printf("[GatewayApp]: Calling TALLY ecall to tally election\n");
 
   sgx_lasterr =
-      ecall_tally(enclave_id, &ecall_retval, (char *)sealed_elgamal_key_buffer,
-                  sealed_elgamal_key_buffer_size);
+      ecall_tally(enclave_id, &ecall_retval, sealed_election_buffer, sealed_election_buffer_size);
   if (sgx_lasterr == SGX_SUCCESS && (ecall_retval != SGX_SUCCESS)) {
     fprintf(stderr, "[GatewayApp]: ERROR: ecall_tally returned %d\n",
             ecall_retval);

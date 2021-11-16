@@ -6,7 +6,9 @@
 
 #include <stdarg.h>
 #include <stdio.h>
+#include <stdlib.h>
 
+#include "election_state.h"
 #include "enclave.h"
 #include <enclave_t.h>
 
@@ -34,16 +36,113 @@
 #define MPZ_WORDS_ENDIANNESS 0 /* Use host endianness */
 #define MPZ_NAILS 0            /* Use full words */
 
-sgx_status_t ecall_cast(char *sealedkey, size_t sealed_key_size) {
+sgx_status_t ecall_cast(char *bal, size_t bal_size, char *signature,
+                        size_t signature_size,
+                        char *hash, size_t hash_size,
+                        char *sealed_election_state_buffer,
+                        size_t sealed_election_state_buffer_size, char *sealed_election_buffer,
+                        size_t sealed_election_buffer_size, char* voterid) {
 
-  // Step 1: Open Context.
   sgx_status_t ret = SGX_ERROR_UNEXPECTED;
+  election_state_t *election_state = NULL;
+  uint32_t election_state_size = sizeof(*election_state);
+  int voter = atoi(voterid);
 
-  print("\nTrustedApp: CAST incomplete\n");
+  // Unseal election state
+  if (sealed_election_state_buffer == NULL ||
+      sealed_election_state_buffer_size == 0) {
+    ret = SGX_ERROR_INVALID_PARAMETER;
+    goto cleanup;
+  }
+  {
+    uint32_t unsealed_election_state_size = sgx_get_encrypt_txt_len(
+        (const sgx_sealed_data_t *)sealed_election_state_buffer);
+    if (unsealed_election_state_size != sizeof(*election_state)) {
+      print("\nTrustedApp: sealed election state size mismatch !\n");
+      ret = SGX_ERROR_INVALID_PARAMETER;
+      goto cleanup;
+    }
+  }
+  election_state = malloc(sizeof(*election_state));
+  if (election_state == NULL) {
+    print("\nTrustedApp: malloc(election_state) failed !\n");
+    ret = SGX_ERROR_OUT_OF_MEMORY;
+    goto cleanup;
+  }
+  memset_s(election_state, sizeof(*election_state), 0, sizeof(*election_state));
+
+  if ((ret = sgx_unseal_data((sgx_sealed_data_t *)sealed_election_state_buffer,
+                             NULL, NULL, (uint8_t *)election_state,
+                             &election_state_size)) != SGX_SUCCESS) {
+    print("\nTrustedApp: sgx_unseal_data() failed !\n");
+    goto cleanup;
+  }
+
+  // Verify signature on ballot
+  print("\nTrustedApp: verify_signature started !\n");
+  {
+    uint8_t result = 255;
+    if ((ret = verify_signature((uint8_t *)bal, (uint32_t)bal_size,
+                                voter == 1 ? election_state->v1_pk : (voter == 2 ? election_state->v2_pk : election_state->v3_pk),
+                                sizeof(voter == 1 ? election_state->v1_pk : (voter == 2 ? election_state->v2_pk : election_state->v3_pk)), signature,
+                                signature_size, &result)) != SGX_SUCCESS) {
+      print("\nTrustedApp: verify_signature failed !\n");
+      goto cleanup;
+    }
+    printf("Signature verification result: %s", result == SGX_EC_VALID ? "True" : "False");
+  }
+
+  printf("EncBallot %s", bal);
+
+  size_t len = 128;
+  size_t final_len = len / 2;
+  unsigned char *chrs;
+
+  if(voter == 1) 
+    chrs = &election_state->v1_ballot[0];
+  if(voter == 2)
+    chrs = &election_state->v2_ballot[0];
+  if(voter == 3)
+    chrs = &election_state->v3_ballot[0];
+  for (size_t i=0, j=0; j<final_len; i+=2, j++)
+      chrs[j] = (bal[i] % 32 + 9) % 25 * 16 + (bal[i+1] % 32 + 9) % 25;
+  
+
+
+
+  //printf("First hexstring %c%c, first byte %d\n", bal[0], bal[1], chrs[0]);
+  print("\nTrustedApp: CAST stored ballot\n");
+  // Check command
+
+  // Increment election state counter
+
+  // Reseal election state
+  // Step 3: Calculate sealed data size.
+  if (sealed_election_buffer_size >=
+      sgx_calc_sealed_data_size(0U, sizeof(election_state))) {
+    if ((ret = sgx_seal_data(
+             0U, NULL, sizeof(election_state), (uint8_t *)&election_state,
+             (uint32_t)sealed_election_buffer_size,
+             (sgx_sealed_data_t *)sealed_election_buffer)) != SGX_SUCCESS) {
+      print("\nTrustedApp: sgx_seal_data() failed !\n");
+      goto cleanup;
+    }
+  } else {
+    print("\n[TrustedApp]: Size allocated for sealedelgamalkey by "
+          "untrusted app "
+          "is less than the required size !\n");
+    ret = SGX_ERROR_INVALID_PARAMETER;
+    goto cleanup;
+  }
+
+  print("\nTrustedApp: CAST completed\n");
   ret = SGX_SUCCESS;
 
 cleanup:
   // Step 4: Close Context.
+  if (election_state) {
+    free(election_state);
+  }
 
   return ret;
 }

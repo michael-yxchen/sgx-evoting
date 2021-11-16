@@ -15,14 +15,18 @@
 
 #include "app.h"
 
-bool enclave_cast_election() {
+bool enclave_cast_election(const char* voterid) {
   sgx_status_t ecall_retval = SGX_ERROR_UNEXPECTED;
 
-  printf("[GatewayApp]: Calling CAST ecall to cast ballot\n");
+  printf("[GatewayApp]: Calling CAST ecall to cast ballot %s\n", voterid);
 
+  
+  
   sgx_lasterr =
-      ecall_cast(enclave_id, &ecall_retval, (char *)sealed_elgamal_key_buffer,
-                 sealed_elgamal_key_buffer_size);
+      ecall_cast(enclave_id, &ecall_retval, enc_ballot_buffer, enc_ballot_buffer_size,
+                 user_sign_buffer, user_sign_buffer_size, election_hash_buffer, election_hash_buffer_size, sealed_election_buffer,
+                 sealed_election_buffer_size, sealed_election_buffer,
+                 sealed_election_buffer_size, voterid);
   if (sgx_lasterr == SGX_SUCCESS && (ecall_retval != SGX_SUCCESS)) {
     fprintf(stderr, "[GatewayApp]: ERROR: ecall_cast returned %d\n",
             ecall_retval);

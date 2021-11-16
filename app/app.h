@@ -60,6 +60,8 @@ extern void *user_sign_buffer;
 extern size_t user_sign_buffer_size;
 extern void *election_hash_buffer;
 extern size_t election_hash_buffer_size;
+extern void *enc_ballot_buffer;
+extern size_t enc_ballot_buffer_size;
 
 extern void *bulletin_buffer;
 extern size_t bulletin_buffer_size;

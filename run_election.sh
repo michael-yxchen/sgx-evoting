@@ -83,10 +83,11 @@ echo ".done"
 
 ../app/app --cast \
     --enclave-path `pwd`/../enclave/enclave.signed.so \
-	# --voter-pubkey ..
 		--usersign EncBallotAlice.signature \
+		--encballot ../ballot_prep/encballot_alice.hex \
 		--electionhash election.hash \
-		--sealedelec sealedhelios_state.bin
+		--sealedelec sealedhelios_state.bin \
+		--voterid "1"
 
 
 
@@ -103,8 +104,10 @@ echo ".done"
 ../app/app --cast \
     --enclave-path `pwd`/../enclave/enclave.signed.so \
 		--usersign EncBallotJustin.signature \
+		--encballot ../ballot_prep/encballot_justin.hex \
 		--electionhash election.hash \
-		--sealedelec sealedhelios_state.bin
+		--sealedelec sealedhelios_state.bin \
+		--voterid "2"
 
 		
 		
@@ -120,8 +123,10 @@ echo ".done"
 ../app/app --cast \
     --enclave-path `pwd`/../enclave/enclave.signed.so \
 		--usersign EncBallotJohn.signature \
+		--encballot ../ballot_prep/encballot_john.hex \
 		--electionhash election.hash \
-		--sealedelec sealedhelios_state.bin
+		--sealedelec sealedhelios_state.bin \
+		--voterid "3"
 
 
 
@@ -135,18 +140,23 @@ echo ".done"
 
 ../app/app --close \
     --enclave-path `pwd`/../enclave/enclave.signed.so \
-		--adminsign Close.signature
+		--command close_command.json \
+		--adminsign Close.signature \
+		--sealedelec sealedhelios_state.bin
 		
 		
 
 # Admin invoking the Ecall to tally the election
-echo '{ command: tally }' > open_command.json
+echo '{ command: tally }' > tally_command.json
 echo -n "Signing command with admin key.."
-openssl dgst -sign secp256r1-key.pem -out Open.signature open_command.json
+openssl dgst -sign secp256r1-key.pem -out Tally.signature tally_command.json
 echo ".done"
 
 ../app/app --tally \
     --enclave-path `pwd`/../enclave/enclave.signed.so \
-		--adminsign tally_command.txt
+		--command tally_command.json \
+		--adminsign Tally.signature \
+		--sealedelec sealedhelios_state.bin
+
 #decrypt ballots.compute tally, post tally, discard sealed key
 

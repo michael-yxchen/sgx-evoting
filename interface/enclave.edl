@@ -66,16 +66,19 @@ enclave
 
 						
         public sgx_status_t ecall_cast(
-            [out, size=sealed_key_size] char *sealedkey,
-            size_t sealed_key_size);
+            [in, size=bal_size] char *bal, size_t bal_size, 
+            [in, size=signature_size]char *signature, size_t signature_size,
+            [in, size=hash_size] char *hash, size_t hash_size, 
+            [in, size=sealed_election_state_buffer_size]char *sealed_election_state_buffer, size_t sealed_election_state_buffer_size,
+            [out, size=sealed_election_buffer_size]char *sealed_election_buffer, size_t sealed_election_buffer_size,
+            [in] char* voterid);
 						
         public sgx_status_t ecall_close(
             [out, size=sealed_key_size] char *sealedkey,
             size_t sealed_key_size);
 						
         public sgx_status_t ecall_tally(
-            [out, size=sealed_key_size] char *sealedkey,
-            size_t sealed_key_size);
+            [in, size=sealed_election_state_buffer_size]char *sealed_election_state_buffer, size_t sealed_election_state_buffer_size);
 						
         public sgx_status_t ecall_unseal_and_sign(
             [in, size=msg_size] uint8_t * msg,

@@ -39,6 +39,8 @@ static struct option long_options[] = {
     {"electionhash", required_argument, 0, 0},
     {"sealedelec", required_argument, 0, 0},
     {"command", required_argument, 0, 0},
+    {"encballot", required_argument, 0, 0},
+    {"voterid", required_argument, 0, 0},
     {0, 0, 0, 0}};
 
 /**
@@ -117,6 +119,15 @@ bool load_electionhash(const char *const hash_file) {
   return ret;
 }
 
+bool load_encballot(const char *const bal_file) {
+  bool ret = false;
+  printf("[GatewayApp]: Loading Enc Ballot file = ");
+  ret = read_file_into_memory(bal_file, &enc_ballot_buffer,
+                              &enc_ballot_buffer_size);
+  printf("%s\n", ret ? "true" : "false");
+  return ret;
+}
+
 int main(int argc, char **argv) {
   bool opt_keygen = false;
   bool opt_quote = false;
@@ -151,6 +162,8 @@ int main(int argc, char **argv) {
 
   const char *opt_sealedelection_file = NULL;
   const char *opt_command_file = NULL;
+  const char *opt_encballot_file = NULL;
+  const char *opt_castvoter;
 
   int option_index = 0;
 
@@ -242,6 +255,14 @@ int main(int argc, char **argv) {
     case 26:
       opt_command_file = optarg;
       break;
+
+    case 27:
+      opt_encballot_file = optarg;
+      break;
+
+    case 28:
+      opt_castvoter = optarg;
+      break;
     }
   }
 
@@ -320,24 +341,24 @@ int main(int argc, char **argv) {
   }
 
   if (opt_cast &&
-      (!opt_enclave_path || !opt_usersign_file || !opt_election_hash)) {
-    fprintf(stderr, "UsageOpen:\n");
+      (!opt_enclave_path || !opt_usersign_file || !opt_election_hash || !opt_encballot_file || !opt_castvoter)) {
+    fprintf(stderr, "UsageCast:\n");
     fprintf(stderr,
-            "  %s --cast --enclave-path --usersign command.txt "
-            "--electionhash hash.txt\n",
+            "  %s --cast --enclave-path --usersign --encballot "
+            "--electionhash\n",
             argv[0]);
     return EXIT_FAILURE;
   }
 
-  if (opt_close && (!opt_enclave_path || !opt_adminsign_file)) {
-    fprintf(stderr, "UsageOpen:\n");
+  if (opt_close && (!opt_enclave_path || !opt_adminsign_file || !opt_command_file)) {
+    fprintf(stderr, "UsageClose:\n");
     fprintf(stderr, "  %s --close --enclave-path --adminsign command.txt\n",
             argv[0]);
     return EXIT_FAILURE;
   }
 
-  if (opt_tally && (!opt_enclave_path || !opt_adminsign_file)) {
-    fprintf(stderr, "UsageOpen:\n");
+  if (opt_tally && (!opt_enclave_path)) {
+    fprintf(stderr, "UsageTally:\n");
     fprintf(stderr, "  %s --tally --enclave-path --adminsign command.txt\n",
             argv[0]);
     return EXIT_FAILURE;
@@ -376,13 +397,18 @@ int main(int argc, char **argv) {
       (opt_open ? enclave_open_election() : true) &&
       // cast
       (opt_cast ? load_usersign(opt_usersign_file) : true) &&
+      (opt_cast ? load_encballot(opt_encballot_file) : true) &&
       (opt_cast ? load_electionhash(opt_election_hash) : true) &&
-      (opt_cast ? enclave_cast_election() : true) &&
+      (opt_cast ? load_election_state(opt_sealedelection_file) : true) &&
+      (opt_cast ? enclave_cast_election(opt_castvoter) : true) &&
       // close
       (opt_close ? load_adminsign(opt_adminsign_file) : true) &&
+      (opt_close ? load_command_file(opt_command_file) : true) &&
+      (opt_close ? load_election_state(opt_sealedelection_file) : true) &&
       (opt_close ? enclave_close_election() : true) &&
       // tally
       (opt_tally ? load_adminsign(opt_adminsign_file) : true) &&
+      (opt_tally ? load_election_state(opt_sealedelection_file) : true) &&
       (opt_tally ? enclave_tally_election() : true) &&
       // quote
       (opt_quote ? load_sealedpubkey(opt_sealedpubkey_file) : true) &&
