@@ -13,13 +13,14 @@ RUN apt-get update && apt-get install -y \
         gdb \
         libsgx-enclave-common-dbgsym \
         libsgx-urts-dbgsym \
+        cmake \
         && rm -rf /var/lib/apt/lists/*
 
 
 ENV SGX_SDK /opt/sgxsdk
 ENV PATH $PATH:$SGX_SDK/bin:$SGX_SDK/bin/x64
 ENV PKG_CONFIG_PATH $SGX_SDK/pkgconfig
-ENV LD_LIBRARY_PATH $SGX_SDK/sdk_libs
+ENV LD_LIBRARY_PATH $SGX_SDK/sdk_libs:/opt/json-c/lib
 
 # installing sgx-gmp library
 RUN cd /tmp; \
@@ -30,6 +31,16 @@ RUN cd /tmp; \
         make -j; \
         make install; \
         ./sgx-configure; \
+        make -j; \
+        make install
+
+RUN cd /tmp; \
+        git clone https://github.com/json-c/json-c.git json-c; \
+        cd json-c; \
+        git checkout 9021cdcdd01fc9dbcbe1f06391848c2ac915212f; \
+        mkdir build; \
+        cd build; \
+        cmake -DCMAKE_INSTALL_PREFIX=/opt/json-c ..;\
         make -j; \
         make install
 
