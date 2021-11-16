@@ -46,6 +46,7 @@ services:
       - ./test.sh:/usr/src/sgxvoting/test.sh
       - ./run_election.sh:/usr/src/sgxvoting/run_election.sh
       - ./demo_sgx:/usr/src/sgxvoting/demo_sgx
+      - ./ballot_prep:/usr/src/sgxvoting/ballot_prep
     command: bash
 
 volumes:

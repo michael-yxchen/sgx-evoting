@@ -121,7 +121,7 @@ sgx_status_t ecall_cast(char *bal, size_t bal_size, char *signature,
   if (sealed_election_buffer_size >=
       sgx_calc_sealed_data_size(0U, sizeof(election_state))) {
     if ((ret = sgx_seal_data(
-             0U, NULL, sizeof(election_state), (uint8_t *)&election_state,
+             0U, NULL, sizeof(*election_state), (uint8_t *)election_state,
              (uint32_t)sealed_election_buffer_size,
              (sgx_sealed_data_t *)sealed_election_buffer)) != SGX_SUCCESS) {
       print("\nTrustedApp: sgx_seal_data() failed !\n");

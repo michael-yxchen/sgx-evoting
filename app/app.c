@@ -395,17 +395,20 @@ int main(int argc, char **argv) {
       (opt_open ? load_command_file(opt_command_file) : true) &&
       (opt_open ? load_election_state(opt_sealedelection_file) : true) &&
       (opt_open ? enclave_open_election() : true) &&
+      (opt_open ? save_election_state_elgamal(opt_sealedelection_file) : true) &&
       // cast
       (opt_cast ? load_usersign(opt_usersign_file) : true) &&
       (opt_cast ? load_encballot(opt_encballot_file) : true) &&
       (opt_cast ? load_electionhash(opt_election_hash) : true) &&
       (opt_cast ? load_election_state(opt_sealedelection_file) : true) &&
       (opt_cast ? enclave_cast_election(opt_castvoter) : true) &&
+      (opt_cast ? save_election_state_elgamal(opt_sealedelection_file) : true) &&
       // close
       (opt_close ? load_adminsign(opt_adminsign_file) : true) &&
       (opt_close ? load_command_file(opt_command_file) : true) &&
       (opt_close ? load_election_state(opt_sealedelection_file) : true) &&
       (opt_close ? enclave_close_election() : true) &&
+      (opt_close ? save_election_state_elgamal(opt_sealedelection_file) : true) &&
       // tally
       (opt_tally ? load_adminsign(opt_adminsign_file) : true) &&
       (opt_tally ? load_election_state(opt_sealedelection_file) : true) &&
