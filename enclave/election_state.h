@@ -4,6 +4,7 @@
 
 #define PK_LEN 64
 #define ENC_BALLOT_LEN 64
+#define BALLOT_LEN 1024
 
 typedef enum state_ctr {
   vt_created = 0,
@@ -18,7 +19,7 @@ typedef struct __attribute__((packed)) election_state {
   uint8_t v1_pk[PK_LEN];
   uint8_t v2_pk[PK_LEN];
   uint8_t v3_pk[PK_LEN];
-  uint8_t ballot_len;
+  uint8_t ballot[BALLOT_LEN];
   int8_t opt1[16];
   int8_t opt2[16];
   int8_t opt3[16];
@@ -35,7 +36,7 @@ typedef struct __attribute__((packed)) election_state {
 
 typedef struct __attribute__((packed)) bulletin_board {
   uint8_t election_hash[32];
-  int8_t ballot[32];
+  uint8_t ballot[BALLOT_LEN];
   uint8_t p[32];
   uint8_t g[32];
   uint8_t pk[32];

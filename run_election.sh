@@ -37,10 +37,22 @@ openssl ec -in justin-key.pem -pubout -out justin.pem 2> /dev/null
 echo "Voter keys for Alice, John, and Justin created.\n"
 
 echo "Creating ballot:"
-echo '3
-Barrack
-Biden
-Trump' > ballot.txt
+echo '[
+        {
+            "question": "Who should be the next president?",
+            "choice": [
+                "Obama",
+                "Trump"
+            ]
+        },
+        {
+            "question": "Who should be the next mayor?",
+            "choice": [
+                "John",
+                "Joe"
+            ]
+        }
+    ]' > ballot.txt
 echo "Ballot created for 3 candidates: Barrack, Joe, Donald.\n"
 # Admin invoking the Ecall to initialize the election
 
@@ -49,13 +61,12 @@ echo "Ballot created for 3 candidates: Barrack, Joe, Donald.\n"
 		--sealedkey sealedkey.bin \
 		--adminkey secp256r1.pem \
 		--ballot ballot.txt \
-		--bulletin bulletin.txt \
+		--bulletin bulletin.json \
 		--voter1 alice.pem \
 		--voter2 john.pem \
 		--voter3 justin.pem \
 		--sealedelec sealedhelios_state.bin
 #open sealed key, initialize state counter to 1, save admin public key, save pks of eligible voters, save ballot, seal meta data, compute hash metadata(-counter)+PK, save election identifier
-
 
 # Admin invoking the Ecall to open the election
 echo '{ command: open }' > open_command.json

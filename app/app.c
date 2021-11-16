@@ -389,7 +389,8 @@ int main(int argc, char **argv) {
       (opt_init ? enclave_init_election() : true) &&
       (opt_init ? save_election_state_elgamal(opt_sealedelection_file)
                 : true) &&
-      (opt_init ? save_bulletin(opt_bulletin_file) : true) &&
+      (opt_init ? save_bulletin(opt_bulletin_file, opt_adminkey_file,
+                             opt_voter1_file, opt_voter2_file, opt_voter3_file) : true) &&
       // open
       (opt_open ? load_adminsign(opt_adminsign_file) : true) &&
       (opt_open ? load_command_file(opt_command_file) : true) &&

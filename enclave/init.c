@@ -119,38 +119,44 @@ sgx_status_t ecall_init(char *sealed, size_t sealed_size,
     election_state.v3_pk[i] = ((uint8_t *)voter3_key_buffer)[i];
   }
 
-  election_state.ballot_len = ((uint8_t *)ballot_buffer)[0];
-  ballot_off += 2;
-
-  opt_off = 0;
-  while (ballot_buffer[ballot_off] != '\n') {
-    if (opt_off < sizeof(election_state.opt1)) {
-      election_state.opt1[opt_off] = ballot_buffer[ballot_off];
-      ++opt_off;
-    }
-    ++ballot_off;
+  // FIXME:
+  assert(ballot_buffer_size <= sizeof(election_state.ballot));
+  for (size_t i = 0; i < ballot_buffer_size; ++i) {
+    election_state.ballot[i] = ballot_buffer[i];
   }
-  ++ballot_off;
 
-  opt_off = 0;
-  while (ballot_buffer[ballot_off] != '\n') {
-    if (opt_off < sizeof(election_state.opt2)) {
-      election_state.opt2[opt_off] = ballot_buffer[ballot_off];
-      ++opt_off;
-    }
-    ++ballot_off;
-  }
-  ++ballot_off;
+  // election_state.ballot_len = ((uint8_t *)ballot_buffer)[0];
+  // ballot_off += 2;
 
-  opt_off = 0;
-  while (ballot_buffer[ballot_off] != '\n') {
-    if (opt_off < sizeof(election_state.opt3)) {
-      election_state.opt3[opt_off] = ballot_buffer[ballot_off];
-      ++opt_off;
-    }
-    ++ballot_off;
-  }
-  ++ballot_off;
+  // opt_off = 0;
+  // while (ballot_buffer[ballot_off] != '\n') {
+  //   if (opt_off < sizeof(election_state.opt1)) {
+  //     election_state.opt1[opt_off] = ballot_buffer[ballot_off];
+  //     ++opt_off;
+  //   }
+  //   ++ballot_off;
+  // }
+  // ++ballot_off;
+
+  // opt_off = 0;
+  // while (ballot_buffer[ballot_off] != '\n') {
+  //   if (opt_off < sizeof(election_state.opt2)) {
+  //     election_state.opt2[opt_off] = ballot_buffer[ballot_off];
+  //     ++opt_off;
+  //   }
+  //   ++ballot_off;
+  // }
+  // ++ballot_off;
+
+  // opt_off = 0;
+  // while (ballot_buffer[ballot_off] != '\n') {
+  //   if (opt_off < sizeof(election_state.opt3)) {
+  //     election_state.opt3[opt_off] = ballot_buffer[ballot_off];
+  //     ++opt_off;
+  //   }
+  //   ++ballot_off;
+  // }
+  // ++ballot_off;
 
   for (size_t i = 0; i < sizeof(election_state.p); ++i) {
     election_state.p[i] = unsealed_data[i];

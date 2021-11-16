@@ -71,35 +71,6 @@ bool save_election_state_elgamal(const char *const sealedkey_file) {
   return ret_status;
 }
 
-bool save_bulletin(const char *const sealedkey_file) {
-  // bool ret_status = true;
-  // ret_status = save_state(sealedprivkey_file, sealed_privkey_buffer,
-  //                        sealed_privkey_buffer_size);
-  // ret_status = save_state(sealedpubkey_file, sealed_pubkey_buffer,
-  //                        sealed_pubkey_buffer_size);
-  // return ret_status;
-  bool ret_status = true;
-
-  printf("[GatewayApp]: Saving bulletin board\n");
-
-  FILE *sk_file = open_file(sealedkey_file, "wb");
-
-  if (sk_file == NULL) {
-    fprintf(stderr, "[GatewayApp]: save_enclave_state() fopen failed\n");
-    sgx_lasterr = SGX_ERROR_UNEXPECTED;
-    return false;
-  }
-
-  if (fwrite(bulletin_buffer, bulletin_buffer_size, 1, sk_file) != 1) {
-    fprintf(stderr, "[GatewayApp]: Enclave state only partially written.\n");
-    sgx_lasterr = SGX_ERROR_UNEXPECTED;
-    ret_status = false;
-  }
-
-  fclose(sk_file);
-
-  return ret_status;
-}
 
 bool load_sealedkey(const char *const sealedkey_file) {
   printf("[GatewayApp]: Loading sealed elgamal key\n");

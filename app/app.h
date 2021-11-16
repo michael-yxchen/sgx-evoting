@@ -120,6 +120,10 @@ bool enclave_gen_quote();
 bool save_enclave_state(const char *const sealedprivkey_file,
                         const char *const sealedpubkey_file);
 bool save_state(const char *const statefile, void *buffer, size_t buffer_size);
+bool save_bulletin(const char *const bulletin_file,
+                   const char *const admin_file, const char *const voter1_file,
+                   const char *const voter2_file,
+                   const char *const voter3_file);
 
 BIGNUM *bignum_from_little_endian_bytes_32(const unsigned char *const bytes);
 
