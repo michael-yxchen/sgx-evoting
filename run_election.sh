@@ -38,12 +38,24 @@ echo "[Shell]: Provisioning election keypair using ADMIN-ECALL:\n"
     --sealedkey sealedkey.bin
 echo "\n[Shell]: ADMIN-ECALL completed.\n\n\n"
 
-echo '{\"question\": \"Who should be the next president?\",\"choice\": [\"Obama\", \"Trump\"]},{\"question\": \"Who should be the next mayor?\", \"choice\": [\"John\",\"Joe\"]}' > ballot.json
-echo '3
-Barrack
-Biden
-Trump' > ballot.txt
+echo '[
+        {
+            "question": "Who should be the next president?",
+            "choice": [
+                "Obama",
+                "Trump"
+            ]
+        },
+        {
+            "question": "Who should be the next mayor?",
+            "choice": [
+                "John",
+                "Joe"
+            ]
+        }
+    ]' > ballot.txt
 echo "[Shell]: Created 2 question ballot for president and mayor with candidates [Obama,Trump], [John,Joe]\n\n\n" 
+
 # Admin invoking the Ecall to initialize the election
 
 echo "[Shell]: Admin invoking election state init using INIT-ECALL:\n"
@@ -52,13 +64,14 @@ echo "[Shell]: Admin invoking election state init using INIT-ECALL:\n"
 		--sealedkey sealedkey.bin \
 		--adminkey secp256r1.pem \
 		--ballot ballot.txt \
-		--bulletin bulletin.txt \
+		--bulletin bulletin.json \
 		--voter1 alice.pem \
 		--voter2 john.pem \
 		--voter3 justin.pem \
 		--sealedelec sealedhelios_state.bin
 #open sealed key, initialize state counter to 1, save admin public key, save pks of eligible voters, save ballot, seal meta data, compute hash metadata(-counter)+PK, save election identifier
 echo "\n[Shell]: INIT-ECALL completed. (ealedhelios_state.bin and bulletin-board.json)\n\n\n"
+
 
 # Admin invoking the Ecall to open the election
 echo '{ command: open }' > open_command.json
@@ -76,7 +89,7 @@ echo "\n[Shell]: OPEN-ECALL completed.\n\n\n"
 
 
 # Observing election hash from bulletin board and saving to seperate file
-head -c 32 bulletin.txt > election.hash
+echo "d04b98f48e8f8bcc15c6ae5ac050801cd6dcfd428fb5f9e65c4e16e7807340fa" > election.hash
 
 # Actions Alice would take to cast her vote 1-2
 #../ballot_prep/bps 
