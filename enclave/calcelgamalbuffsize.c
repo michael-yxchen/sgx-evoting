@@ -32,7 +32,7 @@ ecall_calc_elgamal_buffer_sizes(size_t *e_elgamal_key_buffer_size,
                                 size_t *e_sealed_elgamal_key_buffer_size) {
   *e_elgamal_key_buffer_size = 128;
   *e_sealed_elgamal_key_buffer_size = sgx_calc_sealed_data_size(0U, 128);
-  print("\nTrustedApp: Sizes for sealed elgamal key pair "
+  print("[TrustedApp]: Sizes for sealed elgamal key pair "
         "calculated successfully.\n");
   return SGX_SUCCESS;
 }

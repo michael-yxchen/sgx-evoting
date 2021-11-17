@@ -18,7 +18,7 @@
 bool enclave_cast_election(const char* voterid) {
   sgx_status_t ecall_retval = SGX_ERROR_UNEXPECTED;
 
-  printf("[GatewayApp]: Calling CAST ecall to cast ballot %s\n", voterid);
+  printf("[GatewayApp][CAST]: Calling CAST ecall to cast ballot %s\n", voterid);
 
   
   

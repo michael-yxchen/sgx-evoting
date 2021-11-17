@@ -29,12 +29,11 @@ sgx_status_t verify_signature(uint8_t *msg, uint32_t msg_size, uint8_t *pubkey,
   sgx_status_t ret = SGX_ERROR_UNEXPECTED;
   sgx_ecc_state_handle_t p_ecc_handle = NULL;
 
-  print("\nTrustedApp: Received sensor data, sealed public key, and "
-        "signature.\n");
+  //print("\nTrustedApp: Received sensor data, sealed public key, and signature.\n");
 
   // Open Context.
   if ((ret = sgx_ecc256_open_context(&p_ecc_handle)) != SGX_SUCCESS) {
-    print("\nTrustedApp: sgx_ecc256_open_context() failed !\n");
+    print("[TrustedApp][VERIFY]: sgx_ecc256_open_context() failed !\n");
     goto cleanup;
   }
 
@@ -42,12 +41,12 @@ sgx_status_t verify_signature(uint8_t *msg, uint32_t msg_size, uint8_t *pubkey,
   if ((ret = sgx_ecdsa_verify(msg, msg_size, (sgx_ec256_public_t *)pubkey,
                               (sgx_ec256_signature_t *)signature, result,
                               p_ecc_handle)) != SGX_SUCCESS) {
-    print("\nTrustedApp: sgx_ecdsa_verify() failed !\n");
+    print("[TrustedApp][VERIFY]: sgx_ecdsa_verify() failed !\n");
     goto cleanup;
   }
 
-  print("\nTrustedApp: Unsealed the sealed public key, verified sensor data "
-        "signature with this public key and then, sent the result back.\n");
+  //print("[TrustedApp][VERIFY]: Unsealed the sealed public key, verified sensor data "
+  //      "signature with this public key and then, sent the result back.\n");
   ret = SGX_SUCCESS;
 
 cleanup:

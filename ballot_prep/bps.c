@@ -23,7 +23,7 @@ void generator_Gen();
 #define MPZ_WORDS_ORDER 1      /* Most significant order first */
 #define MPZ_WORDS_ENDIANNESS 0 /* Use host endianness */
 #define MPZ_NAILS 0            /* Use full words */
-
+int only_seed = 0;
 // Generates key pair and encrypts/decrypts message
 int full_elgamal_example(void) {
 
@@ -223,9 +223,9 @@ int ballot_prep(void) {
   struct json_object *electionHash;
   struct json_object *ballot;
   struct json_object *electionKey;
-  struct json_object *p;
-  struct json_object *g;
-  struct json_object *pk;
+  struct json_object *pj;
+  struct json_object *gj;
+  struct json_object *pkj;
   struct json_object *item;
   struct json_object *question;
   struct json_object *choices;
@@ -233,6 +233,21 @@ int ballot_prep(void) {
   int num_selections;
 
   size_t i,j; 
+
+  mpz_t gop;
+
+   mpz_clear(gop);
+  printf("%d\n", gop == NULL);
+
+  mpz_init(gop);
+
+  printf("%d\n", gop == NULL);
+
+  mpz_clear(gop);
+
+  printf("%d\n", gop == NULL);
+
+  return;
 
   time_t t;
   /* Intializes random number generator */
@@ -242,11 +257,11 @@ int ballot_prep(void) {
   int sel;
   printf("[BPS]: Bullentin Board filename?\n    -> ");
 
-  scanf("%s", str);
-  fp = fopen(str,"r");
+  //scanf("%s", str);
+  //fp = fopen(str,"r");
 
-  //printf("\n");
-  //fp = fopen("bulletin-board.json","r");
+  printf("\n");
+  fp = fopen("bulletin-board.json","r");
   if (fp) {
     fread(buffer, 102400, 1, fp);
     fclose(fp);
@@ -255,11 +270,11 @@ int ballot_prep(void) {
     json_object_object_get_ex(parsed_json, "0", &electionHash);
 
     printf("\n[BPS]: Requested Election Hash?\n    -> ");
-    scanf("%s", str);
+    //scanf("%s", str);
 
     int ret = strcmp(str, json_object_get_string(electionHash));
-    //printf("\n");
-    //ret = 0;
+    printf("\n");
+    ret = 0;
     if (ret != 0) {
       printf("[BPS]: Election hash not found.\n[BPS]: Exiting.\n");
       return 1;
@@ -300,11 +315,11 @@ int ballot_prep(void) {
   }
 
   json_object_object_get_ex(parsed_json, "2", &electionKey);
-  p = json_object_array_get_idx(electionKey, 0);
-  g = json_object_array_get_idx(electionKey, 1);
-  pk = json_object_array_get_idx(electionKey, 2);
+  pj = json_object_array_get_idx(electionKey, 0);
+  gj = json_object_array_get_idx(electionKey, 1);
+  pkj = json_object_array_get_idx(electionKey, 2);
 
-  const char *phexstring = json_object_get_string(p);
+  const char *phexstring = json_object_get_string(pj);
   const char *pos = phexstring;
   pos += 62;
   unsigned char pval[32];
@@ -317,7 +332,7 @@ int ballot_prep(void) {
       pos -= 2;
   }
 
-  const char *ghexstring = json_object_get_string(g);
+  const char *ghexstring = json_object_get_string(gj);
   pos = ghexstring;
   pos += 62;
   unsigned char gval[32];
@@ -330,7 +345,7 @@ int ballot_prep(void) {
       pos -= 2;
   }
 
-  const char *pkhexstring = json_object_get_string(pk);
+  const char *pkhexstring = json_object_get_string(pkj);
   pos = pkhexstring;
   pos += 62;
   unsigned char pkval[32];
@@ -365,9 +380,9 @@ int ballot_prep(void) {
 
 
   
-  //gmp_printf("\nvalue of g1: \n%Zd ", g1);
-  //gmp_printf("\nvalue of p1: \n%Zd ", p1);
-  //gmp_printf("\nvalue of pk1: \n%Zd ", pk1);
+  gmp_printf("\nvalue of g1: \n%Zd ", g1);
+  gmp_printf("\nvalue of p1: \n%Zd ", p1);
+  gmp_printf("\nvalue of pk1: \n%Zd ", pk1);
 
   mpz_t plaintext;
   mpz_t ciphertext_0;
@@ -380,9 +395,102 @@ int ballot_prep(void) {
   mpz_import(plaintext, 1, MPZ_WORDS_ORDER, num_selections, MPZ_WORDS_ENDIANNESS, MPZ_NAILS,
              plaintext_choices);
 
+  printf("[BPS]: PT %d %d %d\n", plaintext_choices[0], plaintext_choices[1], plaintext_choices[2]);
+
   //gmp_printf("\nplaintext: \n%Zd", plaintext);
   Elgamal_encrypt(ciphertext_0, ciphertext_1, plaintext, pk1, g1, p1);
   gmp_printf("\n[BPS]: Encrypted Ballot: \n      %Zd\n      %Zd\n", ciphertext_0, ciphertext_1);
+
+  gmp_printf("\nvalue of m: \n%Zd ", plaintext);
+  gmp_printf("\nvalue of c0: \n%Zd ", ciphertext_0);
+  gmp_printf("\nvalue of c1: \n%Zd ", ciphertext_1);
+
+
+
+  char hardcoded_p[32] = {0x7B, 0x9F, 0x4C, 0xA3, 0xF8, 0x8A, 0x0E, 0x1F,
+                          0x4A, 0x8C, 0xEE, 0x10, 0xBE, 0x72, 0x1E, 0x2B,
+                          0x78, 0xAC, 0x50, 0xE0, 0x1B, 0x92, 0x1C, 0x96,
+                          0x9D, 0xF5, 0xF1, 0x30, 0xDD, 0x9C, 0x81, 0x11};
+
+  char hardcoded_q[16] = {0xED, 0xD8, 0x3C, 0x02, 0xE1, 0xC9, 0x5B, 0x6B,
+                          0xF0, 0x33, 0xB5, 0x1E, 0xEA, 0x87, 0xC0, 0x05};
+
+  char hardcoded_3[8] = {0xDD, 0x51, 0x63, 0x42, 0x42, 0xB3, 0x4B, 0x07};
+  char hardcoded_4[6] = {0x71, 0xCB, 0x28, 0xA8, 0x18, 0x21};
+  char hardcoded_5[3] = {0x0F, 0x4C, 0x0F};
+  char hardcoded_6[1] = {0x03};
+  char hardcoded_7[1] = {0x02};
+
+  mpz_t *array;
+  array = (mpz_t *)malloc(7 * sizeof(mpz_t));
+  for (int i = 0; i < 7; i++) {
+    mpz_init(array[i]);
+  }
+
+  mpz_t q;
+  mpz_t p;
+  mpz_t v3, v4, v5, v6, v7;
+
+  mpz_init(q);
+  mpz_init(p);
+  mpz_init(v3);
+  mpz_init(v4);
+  mpz_init(v5);
+  mpz_init(v6);
+  mpz_init(v7);
+
+  /*
+  mpz_set_str(array[0],
+  "7918324333004779287780879909121159911537551977796076554305607309994905870203",
+  10); mpz_set_str(array[1], "7645817649953398726194923102564833517", 10);
+  mpz_set_str(array[2], "525710878681813469", 10);
+  mpz_set_str(array[3], "36389784177521", 10);
+  mpz_set_str(array[4], "1002511", 10);
+  mpz_set_str(array[5], "3", 10);
+  mpz_set_str(array[6], "2", 10);
+  */
+
+  mpz_import(p, 1, MPZ_WORDS_ORDER, 32, MPZ_WORDS_ENDIANNESS, MPZ_NAILS,
+             hardcoded_p);
+  mpz_import(q, 1, MPZ_WORDS_ORDER, 16, MPZ_WORDS_ENDIANNESS, MPZ_NAILS,
+             hardcoded_q);
+  mpz_import(v3, 1, MPZ_WORDS_ORDER, 8, MPZ_WORDS_ENDIANNESS, MPZ_NAILS,
+             hardcoded_3);
+  mpz_import(v4, 1, MPZ_WORDS_ORDER, 6, MPZ_WORDS_ENDIANNESS, MPZ_NAILS,
+             hardcoded_4);
+  mpz_import(v5, 1, MPZ_WORDS_ORDER, 3, MPZ_WORDS_ENDIANNESS, MPZ_NAILS,
+             hardcoded_5);
+  mpz_import(v6, 1, MPZ_WORDS_ORDER, 1, MPZ_WORDS_ENDIANNESS, MPZ_NAILS,
+             hardcoded_6);
+  mpz_import(v7, 1, MPZ_WORDS_ORDER, 1, MPZ_WORDS_ENDIANNESS, MPZ_NAILS,
+             hardcoded_7);
+
+  mpz_set(array[0], p); 
+  mpz_set(array[1], q);
+  mpz_set(array[2], v3);
+  mpz_set(array[3], v4);
+  mpz_set(array[4], v5);
+  mpz_set(array[5], v6);
+  mpz_set(array[6], v7);
+
+  /*for (int i = 0; i < 7; i++) {
+          gmp_printf("[%d]: %Zd\n", i, array[i]);
+  }*/
+
+  mpz_t g;
+  mpz_t sk;
+  mpz_t pk;
+  mpz_init(g);
+  mpz_init(sk);
+  mpz_init(pk);
+
+  generator_Gen(g, array, 7);
+  Elgamal_Gen(sk, pk, g, p);
+
+  gmp_printf("\nvalue of g: \n%Zd ", g);
+  gmp_printf("\nvalue of mod: \n%Zd ", p);
+  gmp_printf("\nvalue of pk: \n%Zd ", pk);
+  gmp_printf("\nvalue of sk: \n%Zd\n", sk);
 
   char ct[64];
   size_t buf_sz = 32;
@@ -395,8 +503,82 @@ int ballot_prep(void) {
 
   print_buf(ct, 64);
 
+  mpz_t decrypted_ciphertext;
+  mpz_init(decrypted_ciphertext);
+
+
+  Elgamal_decrypt(decrypted_ciphertext, ciphertext_0, ciphertext_1, sk, p);
+
+  gmp_printf("\nvalue of decrypted_ct: \n%Zd\n", decrypted_ciphertext);
+
   printf("[BPS]: Saving Encrypted Ballot to \"encballot.hex\".\n[BPS]: Exiting.\n");
   
+
+  mpz_t c_0;
+  mpz_t c_1;
+  mpz_t dc;
+
+  mpz_init(c_0);
+  mpz_init(c_1);
+  mpz_init(dc);
+
+
+  gmp_printf("\nvalue of msg0: \n%Zd", plaintext);
+  Elgamal_encrypt(c_0, c_1, plaintext, pk, g, p);
+  Elgamal_decrypt(dc, c_0, c_1, sk, p);
+  gmp_printf("\nvalue of c0: \n%Zd ", c_0);
+  gmp_printf("\nvalue of c1: \n%Zd ", c_1);
+  gmp_printf("\nvalue of m0: \n%Zd\n", dc);
+
+ 
+  char* bal = "B603DE8E7EE60B5D9FD0A41D4ECD659B5A45F9CA9E2C94DE86D4B857D601BF0B356F1522EC624D353EC6D5493FAF75041ED2834D3ADCB46597E3DE887F36A204";
+  size_t len = 128;
+  size_t final_len = len / 2;
+  unsigned char chrsw[65];
+
+  for (size_t i=0, j=0; j<final_len; i+=2, j++)
+      chrsw[j] = (bal[i] % 32 + 9) % 25 * 16 + (bal[i+1] % 32 + 9) % 25;
+
+  unsigned char rev[65];
+  for(int k = 0; k < 32; k++) {
+    rev[k] = chrsw[31-k];
+    rev[k+32] = chrsw[63-k];
+  }
+
+  //print_buf(rev, 64);
+  //print_buf(chrsw, 64);
+
+  mpz_t ci0;
+  mpz_t ci1;
+  mpz_t dec;
+
+  mpz_init(ci0);
+  mpz_init(ci1);
+  mpz_init(dec);
+
+
+  mpz_import(ci0, 1, MPZ_WORDS_ORDER, 32, MPZ_WORDS_ENDIANNESS, MPZ_NAILS, &chrsw[0]);
+  mpz_import(ci1, 1, MPZ_WORDS_ORDER, 32, MPZ_WORDS_ENDIANNESS, MPZ_NAILS, &chrsw[32]);
+  gmp_printf("\nvalue of g: \n%Zd ", g);
+  gmp_printf("\nvalue of mod: \n%Zd ", p);
+  gmp_printf("\nvalue of pk: \n%Zd ", pk);
+  gmp_printf("\nvalue of sk: \n%Zd\n", sk);
+
+  Elgamal_decrypt(dec, ci0, ci1, sk, p);
+
+  gmp_printf("\nYOO value of c0: \n%Zd ", ci0);
+  gmp_printf("\nYOO value of c1: \n%Zd ", ci1);
+   gmp_printf("\nvalue of msg0: \n%Zd\n", dec);
+  char buffer1[3];
+  size_t buf_sz1 = 2;
+
+
+  /* Exports p/g/pk/sk into buffer */
+  mpz_export(&buffer1[0], &buf_sz1, MPZ_WORDS_ORDER, 2, MPZ_WORDS_ENDIANNESS,
+             MPZ_NAILS, dec);
+
+
+  printf("PT %d %d\n", buffer1[0], buffer1[1]);
 }
 
 int main(void) {
@@ -778,7 +960,7 @@ void generator_Gen(mpz_t g, mpz_t *primes, int sz) {
 
 // Key generator for Elgamal
 void Elgamal_Gen(mpz_t sk, mpz_t pk, mpz_t g, mpz_t modulus) {
-  int seedx = rand();
+  int seedx = 1;//rand();
   gmp_randstate_t ry_state;
 
   gmp_randinit_default(ry_state);

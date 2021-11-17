@@ -18,7 +18,7 @@ bool save_enclave_state_elgamal(const char *const sealedkey_file) {
   // return ret_status;
   bool ret_status = true;
 
-  printf("[GatewayApp]: Saving enclave state - sealed elgamal key\n");
+  printf("[GatewayApp]: Saving enclave state.\n");
 
   FILE *sk_file = open_file(sealedkey_file, "wb");
 
@@ -122,7 +122,7 @@ bool load_sealedkey(const char *const sealedkey_file) {
   /* Put new buffer into context */
   sealed_elgamal_key_buffer = new_buffer;
   sealed_elgamal_key_buffer_size = new_buffer_size;
-  printf("[GatewayApp]: Loading sealed elgamal key %d\n",
-         sealed_elgamal_key_buffer_size);
+  //printf("[GatewayApp]: Loading sealed elgamal key %d\n",
+  //       sealed_elgamal_key_buffer_size);
   return ret_status;
 }

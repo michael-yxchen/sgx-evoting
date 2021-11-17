@@ -53,78 +53,78 @@ bool load_init_files(const char *const ballot_file,
                      const char *const voter2_file,
                      const char *const voter3_file) {
   bool ret = false;
-  printf("[GatewayApp]: Loading INIT ballot file = ");
+  //printf("[GatewayApp]: Loading INIT ballot file = ");
   ret = read_file_into_memory(ballot_file, &ballot_buffer, &ballot_buffer_size);
-  printf("%s\n", ret ? "true" : "false");
-  printf("[GatewayApp]: Loading INIT admin file = ");
+  //printf("%s\n", ret ? "true" : "false");
+  //printf("[GatewayApp]: Loading INIT admin file = ");
   ret = read_pem_pubkey(admin_file, &admin_key_buffer, &admin_key_buffer_size);
-  printf("%s\n", ret ? "true" : "false");
-  printf("[GatewayApp]: Loading INIT voter1 file = ");
+  //printf("%s\n", ret ? "true" : "false");
+  //printf("[GatewayApp]: Loading INIT voter1 file = ");
   ret =
       read_pem_pubkey(voter1_file, &voter1_key_buffer, &voter1_key_buffer_size);
-  printf("%s\n", ret ? "true" : "false");
-  printf("[GatewayApp]: Loading INIT voter2 file = ");
+  //printf("%s\n", ret ? "true" : "false");
+  //printf("[GatewayApp]: Loading INIT voter2 file = ");
   ret =
       read_pem_pubkey(voter2_file, &voter2_key_buffer, &voter2_key_buffer_size);
-  printf("%s\n", ret ? "true" : "false");
-  printf("[GatewayApp]: Loading INIT voter3 file = ");
+  //printf("%s\n", ret ? "true" : "false");
+  //printf("[GatewayApp]: Loading INIT voter3 file = ");
   ret =
       read_pem_pubkey(voter3_file, &voter3_key_buffer, &voter3_key_buffer_size);
-  printf("%s\n", ret ? "true" : "false");
+  //printf("%s\n", ret ? "true" : "false");
   return ret;
 }
 
 bool load_adminsign(const char *const admin_file) {
   bool ret = false;
-  printf("[GatewayApp]: Loading Admin Signature file = ");
+  //printf("[GatewayApp]: Loading Admin Signature file = ");
   ret = read_der_signature(admin_file, &admin_sign_buffer, &admin_sign_buffer_size);
  
-  printf("%s\n", ret ? "true" : "false");
+  //printf("%s\n", ret ? "true" : "false");
   return ret;
 }
 
 bool load_command_file(const char *const command_file) {
   bool ret = false;
-  printf("[GatewayApp]: Loading Command file = ");
+  //printf("[GatewayApp]: Loading Command file = ");
   ret = read_file_into_memory(command_file, &command_buffer,
                               &command_buffer_size);
-  printf("%s\n", ret ? "true" : "false");
+  //printf("%s\n", ret ? "true" : "false");
   return ret;
 }
 
 bool load_election_state(const char *const election_state_file) {
   bool ret = false;
-  printf("[GatewayApp]: Loading Command file = ");
+  //printf("[GatewayApp]: Loading Command file = ");
   ret = read_file_into_memory(election_state_file, &sealed_election_buffer,
                               &sealed_election_buffer_size);
-  printf("%s\n", ret ? "true" : "false");
+  //printf("%s\n", ret ? "true" : "false");
   return ret;
 }
 
 bool load_usersign(const char *const user_file) {
   bool ret = false;
-  printf("[GatewayApp]: Loading Signed User Command file = ");
+  //printf("[GatewayApp]: Loading Signed User Command file = ");
   ret = read_file_into_memory(user_file, &user_sign_buffer,
                               &user_sign_buffer_size);
-  printf("%s\n", ret ? "true" : "false");
+  //printf("%s\n", ret ? "true" : "false");
   return ret;
 }
 
 bool load_electionhash(const char *const hash_file) {
   bool ret = false;
-  printf("[GatewayApp]: Loading Election Hash file = ");
+  //printf("[GatewayApp]: Loading Election Hash file = ");
   ret = read_file_into_memory(hash_file, &election_hash_buffer,
                               &election_hash_buffer_size);
-  printf("%s\n", ret ? "true" : "false");
+  //printf("%s\n", ret ? "true" : "false");
   return ret;
 }
 
 bool load_encballot(const char *const bal_file) {
   bool ret = false;
-  printf("[GatewayApp]: Loading Enc Ballot file = ");
+  //printf("[GatewayApp]: Loading Enc Ballot file = ");
   ret = read_file_into_memory(bal_file, &enc_ballot_buffer,
                               &enc_ballot_buffer_size);
-  printf("%s\n", ret ? "true" : "false");
+  //printf("%s\n", ret ? "true" : "false");
   return ret;
 }
 

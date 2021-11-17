@@ -251,18 +251,18 @@ sgx_status_t ecall_key_gen_and_seal_all_elgamal(char *sealedkey,
     if ((ret = sgx_seal_data(0U, NULL, sizeof(buffer), (uint8_t *)&buffer,
                              (uint32_t)sealed_key_size,
                              (sgx_sealed_data_t *)sealedkey)) != SGX_SUCCESS) {
-      print("\nTrustedApp: sgx_seal_data() failed !\n");
+      print("[TrustedApp][ADMIN]: sgx_seal_data() failed !\n");
       goto cleanup;
     }
   } else {
-    print("\nTrustedApp: Size allocated for sealedelgamalkey by untrusted "
+    print("[TrustedApp][ADMIN]: Size allocated for sealedelgamalkey by untrusted "
           "app "
           "is less than the required size !\n");
     ret = SGX_ERROR_INVALID_PARAMETER;
     goto cleanup;
   }
 
-  print("\nTrustedApp: ELGAMAL Key pair generated and sealed\n");
+  print("[TrustedApp][ADMIN]: ElGamal Key pair generated and sealed\n");
   ret = SGX_SUCCESS;
 
 cleanup:

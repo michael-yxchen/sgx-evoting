@@ -58,14 +58,14 @@ sgx_status_t ecall_cast(char *bal, size_t bal_size, char *signature,
     uint32_t unsealed_election_state_size = sgx_get_encrypt_txt_len(
         (const sgx_sealed_data_t *)sealed_election_state_buffer);
     if (unsealed_election_state_size != sizeof(*election_state)) {
-      print("\nTrustedApp: sealed election state size mismatch !\n");
+      print("[TrustedApp][CAST]: sealed election state size mismatch !\n");
       ret = SGX_ERROR_INVALID_PARAMETER;
       goto cleanup;
     }
   }
   election_state = malloc(sizeof(*election_state));
   if (election_state == NULL) {
-    print("\nTrustedApp: malloc(election_state) failed !\n");
+    print("[TrustedApp][CAST]: malloc(election_state) failed !\n");
     ret = SGX_ERROR_OUT_OF_MEMORY;
     goto cleanup;
   }
@@ -74,30 +74,31 @@ sgx_status_t ecall_cast(char *bal, size_t bal_size, char *signature,
   if ((ret = sgx_unseal_data((sgx_sealed_data_t *)sealed_election_state_buffer,
                              NULL, NULL, (uint8_t *)election_state,
                              &election_state_size)) != SGX_SUCCESS) {
-    print("\nTrustedApp: sgx_unseal_data() failed !\n");
+    print("[TrustedApp][CAST]: sgx_unseal_data() failed !\n");
     goto cleanup;
   }
 
   // Verify signature on ballot
-  print("\nTrustedApp: verify_signature started !\n");
+  print("[TrustedApp][CAST]: Started verify_signature.\n");
   {
     uint8_t result = 255;
     if ((ret = verify_signature((uint8_t *)bal, (uint32_t)bal_size,
                                 voter == 1 ? election_state->v1_pk : (voter == 2 ? election_state->v2_pk : election_state->v3_pk),
                                 sizeof(voter == 1 ? election_state->v1_pk : (voter == 2 ? election_state->v2_pk : election_state->v3_pk)), signature,
                                 signature_size, &result)) != SGX_SUCCESS) {
-      print("\nTrustedApp: verify_signature failed !\n");
+      print("[TrustedApp][CAST]: verify_signature failed !\n");
       goto cleanup;
     }
-    printf("Signature verification result: %s", result == SGX_EC_VALID ? "True" : "False");
+    printf("[TrustedApp][CAST]: Signature verification result: %s\n", result == SGX_EC_VALID ? "True" : "False");
   }
 
-  printf("EncBallot %s", bal);
+  printf("[TrustedApp][CAST]: EncBallot %c%c%c%c....%c%c%c%c\n", bal[0], bal[1], bal[2], bal[3], bal[124], bal[125], bal[126], bal[127]);
 
   size_t len = 128;
   size_t final_len = len / 2;
   unsigned char *chrs;
 
+  //printf("[%d]\n", voter);
   if(voter == 1) 
     chrs = &election_state->v1_ballot[0];
   if(voter == 2)
@@ -111,7 +112,7 @@ sgx_status_t ecall_cast(char *bal, size_t bal_size, char *signature,
 
 
   //printf("First hexstring %c%c, first byte %d\n", bal[0], bal[1], chrs[0]);
-  print("\nTrustedApp: CAST stored ballot\n");
+  print("[TrustedApp][CAST]: Storing ballot.\n");
   // Check command
 
   // Increment election state counter
@@ -119,23 +120,23 @@ sgx_status_t ecall_cast(char *bal, size_t bal_size, char *signature,
   // Reseal election state
   // Step 3: Calculate sealed data size.
   if (sealed_election_buffer_size >=
-      sgx_calc_sealed_data_size(0U, sizeof(election_state))) {
+      sgx_calc_sealed_data_size(0U, sizeof(*election_state))) {
     if ((ret = sgx_seal_data(
              0U, NULL, sizeof(*election_state), (uint8_t *)election_state,
              (uint32_t)sealed_election_buffer_size,
              (sgx_sealed_data_t *)sealed_election_buffer)) != SGX_SUCCESS) {
-      print("\nTrustedApp: sgx_seal_data() failed !\n");
+      print("[TrustedApp][CAST]: sgx_seal_data() failed !\n");
       goto cleanup;
     }
   } else {
-    print("\n[TrustedApp]: Size allocated for sealedelgamalkey by "
+    print("[TrustedApp][CAST]: Size allocated for sealedelgamalkey by "
           "untrusted app "
           "is less than the required size !\n");
     ret = SGX_ERROR_INVALID_PARAMETER;
     goto cleanup;
   }
 
-  print("\nTrustedApp: CAST completed\n");
+  print("[TrustedApp][CAST]: Completed.\n");
   ret = SGX_SUCCESS;
 
 cleanup:

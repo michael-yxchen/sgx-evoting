@@ -18,12 +18,12 @@
 bool enclave_tally_election() {
   sgx_status_t ecall_retval = SGX_ERROR_UNEXPECTED;
 
-  printf("[GatewayApp]: Calling TALLY ecall to tally election\n");
+  printf("[GatewayApp][TALLY]: Calling TALLY ecall to tally election\n");
 
   sgx_lasterr =
       ecall_tally(enclave_id, &ecall_retval, sealed_election_buffer, sealed_election_buffer_size);
   if (sgx_lasterr == SGX_SUCCESS && (ecall_retval != SGX_SUCCESS)) {
-    fprintf(stderr, "[GatewayApp]: ERROR: ecall_tally returned %d\n",
+    fprintf(stderr, "[GatewayApp][TALLY]: ERROR: ecall_tally returned %d\n",
             ecall_retval);
     sgx_lasterr = SGX_ERROR_UNEXPECTED;
   }

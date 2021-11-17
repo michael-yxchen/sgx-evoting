@@ -68,7 +68,7 @@ sgx_status_t ecall_init(char *sealed, size_t sealed_size,
   uint8_t *const unsealed_data =
       (uint8_t *)malloc(unsealed_data_size); // Check malloc return;
   if (unsealed_data == NULL) {
-    print("\nTrustedApp: malloc(unsealed_data_size) failed !\n");
+    print("[TrustedApp][INIT]: malloc(unsealed_data_size) failed !\n");
     goto cleanup;
   }
 
@@ -76,7 +76,7 @@ sgx_status_t ecall_init(char *sealed, size_t sealed_size,
   if ((ret = sgx_unseal_data((sgx_sealed_data_t *)sealed, NULL, NULL,
                              unsealed_data, &unsealed_data_size)) !=
       SGX_SUCCESS) {
-    print("\nTrustedApp: sgx_unseal_data() failed !\n");
+    print("[TrustedApp][INIT]: sgx_unseal_data() failed !\n");
     goto cleanup;
   }
 
@@ -97,7 +97,7 @@ sgx_status_t ecall_init(char *sealed, size_t sealed_size,
   mpz_import(sk, 1, MPZ_WORDS_ORDER, 32, MPZ_WORDS_ENDIANNESS, MPZ_NAILS,
              &unsealed_data[96]);
 
-  print("\n[TrustedApp]: INIT completed\n");
+  print("[TrustedApp][INIT]: Completed.\n");
 
   assert(sizeof(election_state.admin_pk) == admin_key_buffer_size);
   for (size_t i = 0; i < sizeof(election_state.admin_pk); ++i) {
@@ -164,7 +164,7 @@ sgx_status_t ecall_init(char *sealed, size_t sealed_size,
            (char *)&(election_state.sk) - (char *)&election_state,
            (sgx_sha256_hash_t *)&election_state.election_hash)) !=
       SGX_SUCCESS) {
-    print("\nTrustedApp: sgx_sha256_init failed !\n");
+    print("[TrustedApp][INIT]: sgx_sha256_init failed !\n");
     goto cleanup;
   }
 
@@ -185,11 +185,11 @@ sgx_status_t ecall_init(char *sealed, size_t sealed_size,
              0U, NULL, sizeof(election_state), (uint8_t *)&election_state,
              (uint32_t)sealed_election_buffer_size,
              (sgx_sealed_data_t *)sealed_election_buffer)) != SGX_SUCCESS) {
-      print("\nTrustedApp: sgx_seal_data() failed !\n");
+      print("[TrustedApp][INIT]: sgx_seal_data() failed !\n");
       goto cleanup;
     }
   } else {
-    print("\n[TrustedApp]: Size allocated for sealedelgamalkey by "
+    print("[TrustedApp][INIT]: Size allocated for sealedelgamalkey by "
           "untrusted app "
           "is less than the required size !\n");
     ret = SGX_ERROR_INVALID_PARAMETER;
