@@ -16,6 +16,10 @@ LDFLAGS += $(SGX_HOST_LDFLAGS)
 # Add to LDFLAGS if enclave_stub_u is a shared library: -Wl,-rpath,../interface -Wl,-rpath,interface
 LDLIBS += -L ../interface -lenclave_stub_u $(SGX_HOST_LDLIBS) -lcrypto -ldl -L$(JSON_C_DIR)/lib -ljson-c
 
+# For json-c outside docker
+CFLAGS += $(shell pkg-config --cflags json-c)
+LDFLAGS += $(shell pkg-config --libs json-c)
+
 .PHONY: all clean
 
 all: ../interface/libenclave_stub_u.a app
