@@ -104,7 +104,7 @@ bool load_election_state(const char *const election_state_file) {
 bool load_usersign(const char *const user_file) {
   bool ret = false;
   //printf("[GatewayApp]: Loading Signed User Command file = ");
-  ret = read_file_into_memory(user_file, &user_sign_buffer,
+  ret = read_der_signature(user_file, &user_sign_buffer,
                               &user_sign_buffer_size);
   //printf("%s\n", ret ? "true" : "false");
   return ret;

@@ -79,12 +79,20 @@ sgx_status_t ecall_cast(char *bal, size_t bal_size, char *signature,
   }
 
   // Verify signature on ballot
-  print("[TrustedApp][CAST]: Started verify_signature.\n");
+  uint8_t *pubkey;
+  if(voter == 1) {
+    pubkey = election_state->v1_pk;
+  }
+  else if(voter == 2){
+    pubkey = election_state->v2_pk;
+  }
+  else if(voter == 3){
+    pubkey = election_state->v3_pk;
+  }
+  
   {
     uint8_t result = 255;
-    if ((ret = verify_signature((uint8_t *)bal, (uint32_t)bal_size,
-                                voter == 1 ? election_state->v1_pk : (voter == 2 ? election_state->v2_pk : election_state->v3_pk),
-                                sizeof(voter == 1 ? election_state->v1_pk : (voter == 2 ? election_state->v2_pk : election_state->v3_pk)), signature,
+    if ((ret = verify_signature((uint8_t *)bal, (uint32_t)bal_size, pubkey, sizeof(election_state->v1_pk), signature,
                                 signature_size, &result)) != SGX_SUCCESS) {
       print("[TrustedApp][CAST]: verify_signature failed !\n");
       goto cleanup;

@@ -111,6 +111,24 @@ echo "[Shell]: Alice casting vote using the CAST-ECALL:\n"
 echo "\n[Shell]: Alice CAST-ECALL completed.\n\n\n"
 
 
+# Actions John would take to cast her vote 1-2	
+#../ballot_prep/bps 
+#../ballot_prep/bulletin-board.json
+#d04b98f48e8f8bcc15c6ae5ac050801cd6dcfd428fb5f9e65c4e16e7807340fa
+echo -n "[Shell] Using John's prepared encrypted ballot (../ballot_prep/encballot_john.hex).\n"
+echo -n "[Shell] Signing encrypted ballot with John's key.."
+openssl dgst -sign john-key.pem  -out EncBallotJohn.signature ../ballot_prep/encballot_john.hex
+echo ".done"
+
+echo "[Shell]: John casting vote using the CAST-ECALL:\n"
+../app/app --cast \
+    --enclave-path `pwd`/../enclave/enclave.signed.so \
+		--usersign EncBallotJohn.signature \
+		--encballot ../ballot_prep/encballot_john.hex \
+		--electionhash election.hash \
+		--sealedelec sealedhelios_state.bin \
+		--voterid "2"
+echo "\n[Shell]: John CAST-ECALL completed.\n\n\n"
 
 
 
@@ -130,29 +148,12 @@ echo "[Shell]: Justin casting vote using the CAST-ECALL:\n"
 		--encballot ../ballot_prep/encballot_justin.hex \
 		--electionhash election.hash \
 		--sealedelec sealedhelios_state.bin \
-		--voterid "2"
+		--voterid "3"
 echo "\n[Shell]: Justin CAST-ECALL completed.\n\n\n"
 		
 		
 		
-# Actions John would take to cast her vote 1-2	
-#../ballot_prep/bps 
-#../ballot_prep/bulletin-board.json
-#d04b98f48e8f8bcc15c6ae5ac050801cd6dcfd428fb5f9e65c4e16e7807340fa
-echo -n "[Shell] Using John's prepared encrypted ballot (../ballot_prep/encballot_john.hex).\n"
-echo -n "[Shell] Signing encrypted ballot with John's key.."
-openssl dgst -sign john-key.pem -out EncBallotJohn.signature ../ballot_prep/encballot_john.hex
-echo ".done"
 
-echo "[Shell]: John casting vote using the CAST-ECALL:\n"
-../app/app --cast \
-    --enclave-path `pwd`/../enclave/enclave.signed.so \
-		--usersign EncBallotJohn.signature \
-		--encballot ../ballot_prep/encballot_john.hex \
-		--electionhash election.hash \
-		--sealedelec sealedhelios_state.bin \
-		--voterid "3"
-echo "\n[Shell]: John CAST-ECALL completed.\n\n\n"
 
 
 
