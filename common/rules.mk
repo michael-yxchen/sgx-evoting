@@ -33,5 +33,5 @@ lib%_stub_t.a: %.edl
 	$(CC) $(LDFLAGS) $(TARGET_ARCH) $^ $(LOADLIBES) $(LDLIBS) -o $@
 
 %.signed.so: %.unsigned.so %.key.pem
-	$(SGX_ENCLAVE_SIGNER) sign -key $*.key.pem -enclave $< -out $@ -config $*.config.xml
+	$(SGX_ENCLAVE_SIGNER) sign -key $*.key.pem -enclave $< -out $@ -config $*.config.xml -ignore-rel-error
 
