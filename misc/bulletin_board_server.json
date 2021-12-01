@@ -1,0 +1,24 @@
+[
+    {
+        "election_hash": "aaa",
+        "pubkey": "aaa",
+        "ts": 123
+    },
+    {
+        "open": 1,
+        "sig": "x"
+    },
+    {
+        "encrypted_ballot": "xxx",
+        "sig": "xxx",
+        "ts": 1
+    },
+    {
+        "tally result": "0",
+        "tally hash": "hash over all tallied ballots"
+    }
+]
+
+Two API calls
+1. append POST
+2. fetch everything GET
