@@ -1,0 +1,3 @@
+curl -d '{"voter_pubkey": "xxxx", "ballot": "xxxx", "sig": "xxxx"}' -H "Content-Type: application/json" -X POST localhost:5000/post
+curl localhost:5000/fetch
+
